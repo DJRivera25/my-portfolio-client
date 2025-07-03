@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-scroll";
 import landingImage from "../images/landing-image.png";
+import backgroundLanding from "../images/background-landing.png";
 
 const Landing: React.FC = () => {
   return (
@@ -8,8 +9,7 @@ const Landing: React.FC = () => {
       id="landing"
       className="relative text-white bg-cover bg-center min-h-screen flex flex-col items-center justify-start pt-10"
       style={{
-        backgroundImage:
-          "linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url('https://www.shutterstock.com/image-illustration/3d-rendering-abstract-technology-background-260nw-1372325117.jpg')",
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url(${backgroundLanding})`,
       }}
     >
       {/* Image Always First */}
