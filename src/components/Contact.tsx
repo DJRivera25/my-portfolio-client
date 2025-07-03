@@ -22,7 +22,7 @@ const Contact: React.FC = () => {
     message: "",
   });
 
-  const { isLoggedIn } = useAuth(); // ✅ Use context for admin state
+  const { isLoggedIn, fetchUnseenCount } = useAuth(); // ✅ Use context for admin state
 
   const fetchSocials = async () => {
     try {
@@ -39,6 +39,9 @@ const Contact: React.FC = () => {
       await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/messages`, form);
       alert("Message sent successfully!");
       setForm({ name: "", email: "", subject: "", message: "" });
+      if (isLoggedIn) {
+        await fetchUnseenCount(); // 👈 Update Inbox badge count
+      }
     } catch (err) {
       console.error("Error sending message:", err);
       alert("Something went wrong. Try again.");
