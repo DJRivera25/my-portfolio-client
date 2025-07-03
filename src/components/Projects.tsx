@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FileText, Plus, Trash2, Pencil, Upload } from "lucide-react";
+import { Plus, Trash2, Pencil, Upload } from "lucide-react";
 import axios from "axios";
 import ProjectModal from "./ProjectModal";
 import ResumeModal from "./ResumeModal";
@@ -167,17 +167,12 @@ const Projects: React.FC = () => {
         )}
 
         {/* Resume Viewer */}
-        <div className="mt-12 flex justify-center">
+        <div className="mt-12 flex justify-center" id="resume">
           {resumeUrl ? (
             <div className="mt-12 max-w-4xl mx-auto w-full">
               <h3 className="text-xl font-semibold text-yellow-400 mb-4 text-center">View My Resume</h3>
               <div className="border border-white/10 rounded-lg overflow-hidden shadow-lg">
-                <iframe
-                  src={`${resumeUrl}.pdf`}
-                  title="My Resume"
-                  className="w-full h-[80vh] rounded-md"
-                  frameBorder="0"
-                />
+                <iframe src={resumeUrl} title="My Resume" className="w-full h-[80vh] rounded-md" frameBorder="0" />
               </div>
             </div>
           ) : (

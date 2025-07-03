@@ -11,10 +11,12 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 
 import Login from "./pages/Login"; // 👈 Make sure this file exists
+import Inbox from "./pages/Inbox"; // 👈 Make sure this file exists
+
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const HomePage = () => (
   <>
-    <Navbar />
     <Landing />
     <About />
     <Projects />
@@ -28,10 +30,36 @@ const App: React.FC = () => {
   return (
     <Router>
       <div className="font-[Montserrat]">
+        <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<Login />} />
-          <Route path="*" element={<div className="text-center mt-20 text-white">404 - Page Not Found</div>} />
+          <Route
+            path="/inbox"
+            element={
+              <ProtectedRoute>
+                <Inbox />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <>
+                <section id="landing" className="min-h-screen flex flex-col justify-center items-center text-white">
+                  <h1 className="text-4xl font-bold mb-4">404 - Page Not Found</h1>
+                  <p className="text-white/70 mb-8">Oops! The page you're looking for doesn't exist.</p>
+                  <a
+                    href="/"
+                    className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black rounded shadow transition"
+                  >
+                    Go Back Home
+                  </a>
+                </section>
+                <Footer />
+              </>
+            }
+          />
         </Routes>
       </div>
     </Router>

@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-scroll";
+import { Link as ScrollLink } from "react-scroll";
+import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
 import myPhoto from "../images/my-photo.png";
 import { Menu, X } from "lucide-react";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [unseenCount, setUnseenCount] = useState(0);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const navLinks = [
     { to: "landing", label: "Home" },
     { to: "about", label: "About" },
     { to: "projects", label: "Projects" },
+    { to: "resume", label: "Resume" },
     { to: "tools", label: "Tools" },
     { to: "contact", label: "Contact" },
   ];
@@ -18,45 +24,91 @@ const Navbar: React.FC = () => {
   const handleToggle = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
 
+  const fetchUnseenCount = async () => {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/messages`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      const unseen = res.data.filter((m: any) => !m.hasViewed).length;
+      setUnseenCount(unseen);
+    } catch (err) {
+      console.error("Error fetching unseen messages:", err);
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
-  }, []);
+    if (token) {
+      setIsLoggedIn(true);
+      fetchUnseenCount();
+    }
+  }, [unseenCount]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
     localStorage.clear();
     setIsLoggedIn(false);
+    navigate("/login");
   };
+
+  const isHomePage = location.pathname === "/";
 
   return (
     <nav className="sticky top-0 z-50 bg-black/70 backdrop-blur-lg text-white shadow-lg">
       <div className="container mx-auto px-6 py-3 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <a href={isLoggedIn ? "/" : "/login"}>
+          <RouterLink to={isLoggedIn ? "/" : "/login"}>
             <img
               src={myPhoto}
               alt="DJR"
               className="w-10 h-10 rounded-full object-cover border-2 border-blue-600 shadow-md cursor-pointer hover:opacity-80 transition"
             />
-          </a>
-          <a href="#landing" className="text-xl font-bold tracking-wide text-white hover:text-blue-400 transition">
+          </RouterLink>
+          <RouterLink to="/" className="text-xl font-bold tracking-wide text-white hover:text-blue-400 transition">
             DJR
-          </a>
+          </RouterLink>
         </div>
 
         {/* Desktop Nav */}
         <ul className="hidden lg:flex gap-8 font-medium text-sm tracking-wide uppercase items-center">
-          {navLinks.map(({ to, label }) => (
-            <li key={to}>
-              <Link to={to} smooth duration={500} className="cursor-pointer hover:text-blue-400 transition-colors">
-                {label}
-              </Link>
-            </li>
-          ))}
+          {isHomePage &&
+            navLinks.map(({ to, label }) => (
+              <li key={to}>
+                <ScrollLink
+                  to={to}
+                  smooth
+                  duration={500}
+                  className="cursor-pointer hover:text-blue-400 transition-colors"
+                >
+                  {label}
+                </ScrollLink>
+              </li>
+            ))}
 
-          {/* Show logout only when logged in */}
+          {!isHomePage && (
+            <li>
+              <RouterLink to="/" className="cursor-pointer hover:text-blue-400 transition-colors">
+                Home
+              </RouterLink>
+            </li>
+          )}
+
+          {isLoggedIn && (
+            <li>
+              <button
+                onClick={() => navigate("/inbox")}
+                className="relative px-3 py-1 hover:text-yellow-400 transition"
+              >
+                INBOX
+                {unseenCount > 0 && (
+                  <span className="absolute -top-1 -right-2 bg-red-600 text-xs px-1.5 py-0.5 rounded-full font-bold">
+                    {unseenCount}
+                  </span>
+                )}
+              </button>
+            </li>
+          )}
+
           {isLoggedIn && (
             <li>
               <button
@@ -81,33 +133,62 @@ const Navbar: React.FC = () => {
       {isOpen && (
         <div className="lg:hidden bg-black/90 backdrop-blur-md px-6 py-4">
           <ul className="flex flex-col gap-4 text-white uppercase text-sm font-medium">
-            {navLinks.map(({ to, label }) => (
-              <li key={to}>
-                <Link
-                  to={to}
-                  smooth
-                  duration={500}
+            {isHomePage &&
+              navLinks.map(({ to, label }) => (
+                <li key={to}>
+                  <ScrollLink
+                    to={to}
+                    smooth
+                    duration={500}
+                    onClick={closeMenu}
+                    className="block py-2 border-b border-white/10 hover:text-blue-400 transition"
+                  >
+                    {label}
+                  </ScrollLink>
+                </li>
+              ))}
+
+            {!isHomePage && (
+              <li>
+                <RouterLink
+                  to="/"
                   onClick={closeMenu}
                   className="block py-2 border-b border-white/10 hover:text-blue-400 transition"
                 >
-                  {label}
-                </Link>
+                  Home
+                </RouterLink>
               </li>
-            ))}
+            )}
 
-            {/* Mobile Logout */}
             {isLoggedIn && (
-              <li>
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    closeMenu();
-                  }}
-                  className="block w-full text-left py-2 text-red-400 hover:text-red-300 border-t border-white/10 mt-2"
-                >
-                  Logout
-                </button>
-              </li>
+              <>
+                <li>
+                  <button
+                    onClick={() => {
+                      navigate("/inbox");
+                      closeMenu();
+                    }}
+                    className="flex items-center justify-between w-full py-2 border-b border-white/10 hover:text-yellow-400"
+                  >
+                    INBOX
+                    {unseenCount > 0 && (
+                      <span className="bg-red-600 text-xs px-1.5 py-0.5 rounded-full font-bold">{unseenCount}</span>
+                    )}
+                  </button>
+                </li>
+
+                <li>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      closeMenu();
+                    }}
+                    className="block w-full text-left py-2 text-red-400 hover:text-red-300 border-t border-white/10 mt-2"
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
             )}
           </ul>
         </div>

@@ -15,6 +15,12 @@ const Contact: React.FC = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editSocial, setEditSocial] = useState<Social | null>(null);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
 
   const fetchSocials = async () => {
     try {
@@ -22,6 +28,18 @@ const Contact: React.FC = () => {
       setSocials(res.data);
     } catch (err) {
       console.error("Error fetching socials:", err);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/messages`, form);
+      alert("Message sent successfully!");
+      setForm({ name: "", email: "", subject: "", message: "" });
+    } catch (err) {
+      console.error("Error sending message:", err);
+      alert("Something went wrong. Try again.");
     }
   };
 
@@ -104,57 +122,73 @@ const Contact: React.FC = () => {
                   )}
                 </div>
               ))}
-              <div className="space-y-3 text-white">
-                <div className="flex items-center gap-3">
-                  <svg
-                    className="w-5 h-5 text-yellow-400"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M4 4h16v16H4z" stroke="none" />
-                    <path d="M4 4l8 8 8-8" />
-                  </svg>
-                  <span className="break-all">djrrivera25@gmail.com</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <svg
-                    className="w-5 h-5 text-yellow-400"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M22 16.92V20a2 2 0 0 1-2.18 2A19.75 19.75 0 0 1 2 4.18 2 2 0 0 1 4 2h3.09a2 2 0 0 1 2 1.72 12.1 12.1 0 0 0 .57 2.57 2 2 0 0 1-.45 2.11L8 10a16 16 0 0 0 6 6l1.6-1.21a2 2 0 0 1 2.11-.45 12.1 12.1 0 0 0 2.57.57A2 2 0 0 1 22 16.92z" />
-                  </svg>
-                  <span>+63 933 851 8806</span>
-                </div>
+            </div>
+
+            {/* Email and phone under social icons */}
+            <div className="mt-6 space-y-3 text-white">
+              <div className="flex items-center gap-3">
+                <svg
+                  className="w-5 h-5 text-yellow-400"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M4 4h16v16H4z" stroke="none" />
+                  <path d="M4 4l8 8 8-8" />
+                </svg>
+                <span className="break-all">djrrivera25@gmail.com</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <svg
+                  className="w-5 h-5 text-yellow-400"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M22 16.92V20a2 2 0 0 1-2.18 2A19.75 19.75 0 0 1 2 4.18 2 2 0 0 1 4 2h3.09a2 2 0 0 1 2 1.72 12.1 12.1 0 0 0 .57 2.57 2 2 0 0 1-.45 2.11L8 10a16 16 0 0 0 6 6l1.6-1.21a2 2 0 0 1 2.11-.45 12.1 12.1 0 0 0 2.57.57A2 2 0 0 1 22 16.92z" />
+                </svg>
+                <span>+63 933 851 8806</span>
               </div>
             </div>
           </div>
 
           {/* Right Form */}
-          <form className="w-full max-w-xl mx-auto space-y-4 backdrop-blur-sm bg-white/10 p-6 rounded-lg border border-white/20">
+          <form
+            onSubmit={handleSubmit}
+            className="w-full max-w-xl mx-auto space-y-4 backdrop-blur-sm bg-white/10 p-6 rounded-lg border border-white/20"
+          >
             <input
               type="text"
               placeholder="Enter Your Name"
-              className="w-full border-b-2 bg-transparent text-white focus:outline-none focus:ring-0 focus:border-white placeholder-white"
+              className="w-full border-b-2 bg-transparent text-white placeholder-white"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              required
             />
             <input
               type="email"
               placeholder="Your Email Address"
-              className="w-full border-b-2 bg-transparent text-white focus:outline-none focus:ring-0 focus:border-white placeholder-white"
+              className="w-full border-b-2 bg-transparent text-white placeholder-white"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              required
             />
             <input
               type="text"
               placeholder="Subject"
-              className="w-full border-b-2 bg-transparent text-white focus:outline-none focus:ring-0 focus:border-white placeholder-white"
+              className="w-full border-b-2 bg-transparent text-white placeholder-white"
+              value={form.subject}
+              onChange={(e) => setForm({ ...form, subject: e.target.value })}
             />
             <textarea
               placeholder="Write me a message"
               rows={6}
-              className="w-full border-b-2 bg-transparent text-white focus:outline-none focus:ring-0 focus:border-white placeholder-white"
+              className="w-full border-b-2 bg-transparent text-white placeholder-white"
+              value={form.message}
+              onChange={(e) => setForm({ ...form, message: e.target.value })}
+              required
             ></textarea>
             <button
               type="submit"
