@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link as ScrollLink } from "react-scroll";
 import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import { useAuth } from "../context/AuthContext"; // 👈 Use your auth context
 import myPhoto from "../images/my-photo.png";
 import { Menu, X } from "lucide-react";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [unseenCount, setUnseenCount] = useState(0);
+  const { isLoggedIn, unseenCount, logout } = useAuth(); // 👈 From context
   const navigate = useNavigate();
   const location = useLocation();
+
+  const isHomePage = location.pathname === "/";
 
   const navLinks = [
     { to: "landing", label: "Home" },
@@ -24,33 +25,10 @@ const Navbar: React.FC = () => {
   const handleToggle = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
 
-  const fetchUnseenCount = async () => {
-    try {
-      const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/messages`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      const unseen = res.data.filter((m: any) => !m.hasViewed).length;
-      setUnseenCount(unseen);
-    } catch (err) {
-      console.error("Error fetching unseen messages:", err);
-    }
-  };
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      setIsLoggedIn(true);
-      fetchUnseenCount();
-    }
-  }, [unseenCount]);
-
   const handleLogout = () => {
-    localStorage.clear();
-    setIsLoggedIn(false);
+    logout(); // 👈 Use context logout
     navigate("/login");
   };
-
-  const isHomePage = location.pathname === "/";
 
   return (
     <nav className="sticky top-0 z-50 bg-black/70 backdrop-blur-lg text-white shadow-lg">

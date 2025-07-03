@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext"; // ✅ import context
 
 interface Message {
   _id: string;
@@ -14,6 +15,7 @@ interface Message {
 const AdminMessages: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [selected, setSelected] = useState<Message | null>(null);
+  const { fetchUnseenCount } = useAuth(); // ✅ grab function from context
 
   const fetchMessages = async () => {
     try {
@@ -27,29 +29,39 @@ const AdminMessages: React.FC = () => {
   };
 
   const markAsSeen = async (id: string) => {
-    await axios.patch(
-      `${process.env.REACT_APP_API_BASE_URL}/api/messages/${id}/viewed`,
-      {},
-      {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      }
-    );
+    try {
+      await axios.patch(
+        `${process.env.REACT_APP_API_BASE_URL}/api/messages/${id}/viewed`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+      fetchUnseenCount(); // ✅ update navbar count after viewing
+    } catch (err) {
+      console.error("Error marking message as seen:", err);
+    }
   };
 
   const deleteMessage = async (id: string) => {
     const confirm = window.confirm("Are you sure you want to delete this message?");
     if (!confirm) return;
 
-    await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/messages/${id}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    });
-    fetchMessages();
+    try {
+      await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/messages/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      fetchMessages();
+      fetchUnseenCount(); // ✅ update badge after deletion
+    } catch (err) {
+      console.error("Error deleting message:", err);
+    }
   };
 
   const handleClickMessage = async (msg: Message) => {
     if (!msg.hasViewed) await markAsSeen(msg._id);
     setSelected({ ...msg, hasViewed: true });
-    fetchMessages(); // refresh seen status visually
+    fetchMessages(); // ✅ re-fetch list to visually update
   };
 
   useEffect(() => {

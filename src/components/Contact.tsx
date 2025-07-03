@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Plus, Trash2, Pencil } from "lucide-react";
-import SocialModal from "./SocialModal"; // ✅ the modal component
+import SocialModal from "./SocialModal";
+import { useAuth } from "../context/AuthContext"; // ✅ Import AuthContext
 
 interface Social {
   _id?: string;
@@ -12,7 +13,6 @@ interface Social {
 
 const Contact: React.FC = () => {
   const [socials, setSocials] = useState<Social[]>([]);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editSocial, setEditSocial] = useState<Social | null>(null);
   const [form, setForm] = useState({
@@ -21,6 +21,8 @@ const Contact: React.FC = () => {
     subject: "",
     message: "",
   });
+
+  const { isLoggedIn } = useAuth(); // ✅ Use context for admin state
 
   const fetchSocials = async () => {
     try {
@@ -43,18 +45,12 @@ const Contact: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsAdmin(!!token);
-    fetchSocials();
-  }, []);
-
   const handleDelete = async (id: string) => {
     if (!window.confirm("Delete this social link?")) return;
 
     try {
       await axios.delete(`${process.env.REACT_APP_API_BASE_URL}/api/socials/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }, // 🔐 Secure backend with token
       });
       setSocials((prev) => prev.filter((s) => s._id !== id));
     } catch (err) {
@@ -66,6 +62,10 @@ const Contact: React.FC = () => {
     setEditSocial(social || null);
     setIsModalOpen(true);
   };
+
+  useEffect(() => {
+    fetchSocials();
+  }, []);
 
   return (
     <section
@@ -81,7 +81,7 @@ const Contact: React.FC = () => {
         <h2 className="text-4xl font-bold mb-10">Let's work together</h2>
 
         <div className="grid md:grid-cols-2 gap-12">
-          {/* Left */}
+          {/* Left Side */}
           <div>
             <h3 className="text-2xl font-semibold mb-4">Get in touch with Me</h3>
             <p className="mb-6 leading-relaxed">
@@ -90,7 +90,7 @@ const Contact: React.FC = () => {
 
             <h4 className="text-xl font-medium mb-3">Follow Me:</h4>
 
-            {isAdmin && (
+            {isLoggedIn && (
               <button
                 onClick={() => openModal()}
                 className="mb-4 inline-flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded shadow"
@@ -110,7 +110,7 @@ const Contact: React.FC = () => {
                       className="w-12 h-12 rounded-full object-contain hover:scale-110 transition-transform"
                     />
                   </a>
-                  {isAdmin && (
+                  {isLoggedIn && (
                     <div className="absolute -top-2 -right-2 flex gap-1">
                       <button onClick={() => handleDelete(social._id!)} className="text-red-400 hover:text-red-600">
                         <Trash2 size={14} />
@@ -124,7 +124,7 @@ const Contact: React.FC = () => {
               ))}
             </div>
 
-            {/* Email and phone under social icons */}
+            {/* Email & Phone */}
             <div className="mt-6 space-y-3 text-white">
               <div className="flex items-center gap-3">
                 <svg

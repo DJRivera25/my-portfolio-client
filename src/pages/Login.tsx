@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // <-- make sure path is correct
 
 const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth(); // <-- get login function from context
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,9 +23,10 @@ const AdminLogin: React.FC = () => {
         setError("Access denied. You are not an admin.");
         return;
       }
+      console.log(data);
 
-      localStorage.setItem("token", data.token);
-      navigate("/"); // Redirect to homepage or admin dashboard
+      login(data.token); // <- use context to set token and update auth state
+      navigate("/");
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed");
     }
