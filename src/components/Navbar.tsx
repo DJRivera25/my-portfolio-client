@@ -83,7 +83,7 @@ const Navbar: React.FC = () => {
   };
   const navItemVariants = {
     hidden: { opacity: 0, y: -10 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 200 } },
+    show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 200 } },
   };
 
   // Get underline position and width
@@ -151,13 +151,15 @@ const Navbar: React.FC = () => {
               boxShadow: `0 2px 16px 0 #FFD60099`,
               filter: "blur(0.5px)",
             }}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            transition={{ type: "spring" as const, stiffness: 400, damping: 30 }}
             layout
           />
           {navLinks.map(({ to, label }) => (
             <motion.li
               key={to}
-              ref={(el: HTMLLIElement | null) => (navRefs.current[to] = el)}
+              ref={(el: HTMLLIElement | null) => {
+                navRefs.current[to] = el;
+              }}
               className="relative"
               variants={navItemVariants}
               tabIndex={0}

@@ -39,7 +39,7 @@ const containerVariants = {
 };
 const itemVariants = {
   hidden: { opacity: 0, scale: 0.8, y: 30 },
-  show: { opacity: 1, scale: 1, y: 0, transition: { type: "spring", stiffness: 80 } },
+  show: { opacity: 1, scale: 1, y: 0, transition: { type: "spring" as const, stiffness: 80 } },
 };
 
 const Tools: React.FC = () => {
