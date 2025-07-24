@@ -1,6 +1,9 @@
+"use client";
+
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { X } from "lucide-react";
+import { toast } from "react-toastify";
 
 interface Project {
   _id?: string;
@@ -24,6 +27,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -50,7 +54,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("title", title);
@@ -59,23 +63,25 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
       if (imageFile) {
         formData.append("image", imageFile);
       }
-
       const config = {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       };
-
       if (initialData?._id) {
-        await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/projects/${initialData._id}`, formData, config);
+        await axios.put(`/api/projects/${initialData._id}`, formData, config);
+        toast.success("Project updated successfully!");
       } else {
-        await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/projects`, formData, config);
+        await axios.post("/api/projects", formData, config);
+        toast.success("Project added successfully!");
       }
-
       onSaved();
     } catch (error) {
+      toast.error("Error saving project. Please try again.");
       console.error("Error saving project:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -132,9 +138,27 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
 
           <button
             type="submit"
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 rounded-md shadow transition"
+            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 rounded-md shadow transition flex items-center justify-center"
+            disabled={loading}
           >
-            {initialData ? "Update Project" : "Create Project"}
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-black"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                </svg>
+                Saving...
+              </span>
+            ) : initialData ? (
+              "Update Project"
+            ) : (
+              "Create Project"
+            )}
           </button>
         </form>
       </div>

@@ -1,6 +1,9 @@
+"use client";
+
 import React, { useRef, useState } from "react";
 import axios from "axios";
 import { X } from "lucide-react";
+import { toast } from "react-toastify";
 
 interface ResumeModalProps {
   isOpen: boolean;
@@ -27,21 +30,20 @@ const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose, onSaved }) =
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!resumeFile) return;
-
+    setLoading(true);
     try {
-      setLoading(true);
       const formData = new FormData();
       formData.append("resume", resumeFile);
-
-      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/resume`, formData, {
+      await axios.post("/api/resume", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-
+      toast.success("Resume uploaded successfully!");
       onSaved();
     } catch (err) {
+      toast.error("Failed to upload resume. Please try again.");
       console.error("Failed to upload resume:", err);
     } finally {
       setLoading(false);
@@ -84,10 +86,25 @@ const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose, onSaved }) =
 
           <button
             type="submit"
-            disabled={loading || !resumeFile}
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 rounded-md shadow transition"
+            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 rounded-md shadow transition flex items-center justify-center"
+            disabled={loading}
           >
-            {loading ? "Uploading..." : "Save Resume"}
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-black"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                </svg>
+                Uploading...
+              </span>
+            ) : (
+              "Upload Resume"
+            )}
           </button>
         </form>
       </div>

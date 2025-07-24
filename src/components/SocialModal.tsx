@@ -1,6 +1,9 @@
+"use client";
+
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { X } from "lucide-react";
+import { toast } from "react-toastify";
 
 interface Social {
   _id?: string;
@@ -21,6 +24,7 @@ const SocialModal: React.FC<SocialModalProps> = ({ isOpen, onClose, onSaved, ini
   const [url, setUrl] = useState("");
   const [iconFile, setIconFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -46,7 +50,7 @@ const SocialModal: React.FC<SocialModalProps> = ({ isOpen, onClose, onSaved, ini
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("platform", platform);
@@ -54,23 +58,30 @@ const SocialModal: React.FC<SocialModalProps> = ({ isOpen, onClose, onSaved, ini
       if (iconFile) {
         formData.append("icon", iconFile);
       }
-
-      const config = {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      };
-
       if (initialData?._id) {
-        await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/socials/${initialData._id}`, formData, config);
+        formData.append("id", initialData._id);
+        await axios.put("/api/socials", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        toast.success("Social link updated successfully!");
       } else {
-        await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/socials`, formData, config);
+        await axios.post("/api/socials", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        toast.success("Social link added successfully!");
       }
-
       onSaved();
     } catch (error) {
+      toast.error("Error saving social link. Please try again.");
       console.error("Error saving social:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -120,9 +131,27 @@ const SocialModal: React.FC<SocialModalProps> = ({ isOpen, onClose, onSaved, ini
 
           <button
             type="submit"
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 rounded-md shadow transition"
+            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 rounded-md shadow transition flex items-center justify-center"
+            disabled={loading}
           >
-            {initialData ? "Update Social" : "Create Social"}
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-black"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                </svg>
+                Saving...
+              </span>
+            ) : initialData ? (
+              "Update Social"
+            ) : (
+              "Create Social"
+            )}
           </button>
         </form>
       </div>

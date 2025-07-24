@@ -1,20 +1,22 @@
+"use client";
+
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext"; // <-- make sure path is correct
 
 const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const navigate = useRouter();
   const { login } = useAuth(); // <-- get login function from context
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const { data } = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/login`, {
+      const { data } = await axios.post("/api/auth/login", {
         email,
         password,
       });
@@ -26,7 +28,7 @@ const AdminLogin: React.FC = () => {
       console.log(data);
 
       login(data.token); // <- use context to set token and update auth state
-      navigate("/");
+      navigate.push("/");
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed");
     }

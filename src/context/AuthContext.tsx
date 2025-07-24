@@ -1,4 +1,6 @@
 // src/context/AuthContext.tsx
+"use client";
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 
@@ -13,13 +15,15 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [unseenCount, setUnseenCount] = useState(0);
 
   const fetchUnseenCount = async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/messages`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      if (!token) return;
+      const res = await axios.get(`/api/messages`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
       const unseen = res.data.filter((m: any) => !m.hasViewed).length;
       setUnseenCount(unseen);
@@ -29,16 +33,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const login = (token: string) => {
-    localStorage.setItem("token", token);
-    setIsLoggedIn(true);
-    fetchUnseenCount(); // Fetch inbox count after login
+    if (typeof window !== "undefined") {
+      localStorage.setItem("token", token);
+      setIsLoggedIn(true);
+      fetchUnseenCount(); // Fetch inbox count after login
+    }
   };
 
   const logout = () => {
-    localStorage.clear();
-    setIsLoggedIn(false);
-    setUnseenCount(0);
+    if (typeof window !== "undefined") {
+      localStorage.clear();
+      setIsLoggedIn(false);
+      setUnseenCount(0);
+    }
   };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsLoggedIn(!!localStorage.getItem("token"));
+    }
+  }, []);
 
   useEffect(() => {
     if (isLoggedIn) fetchUnseenCount();

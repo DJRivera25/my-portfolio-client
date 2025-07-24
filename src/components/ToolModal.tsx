@@ -1,6 +1,9 @@
+"use client";
+
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { X } from "lucide-react";
+import { toast } from "react-toastify";
 
 interface Tool {
   _id?: string;
@@ -48,7 +51,6 @@ const ToolModal: React.FC<ToolModalProps> = ({ isOpen, onClose, onSaved, initial
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const formData = new FormData();
       formData.append("name", name);
@@ -56,22 +58,27 @@ const ToolModal: React.FC<ToolModalProps> = ({ isOpen, onClose, onSaved, initial
       if (iconFile) {
         formData.append("icon", iconFile);
       }
-
-      const config = {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      };
-
       if (initialData?._id) {
-        await axios.put(`${process.env.REACT_APP_API_BASE_URL}/api/tools/${initialData._id}`, formData, config);
+        formData.append("id", initialData._id);
+        await axios.put("/api/tools", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        toast.success("Tool updated successfully!");
       } else {
-        await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/tools`, formData, config);
+        await axios.post("/api/tools", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        toast.success("Tool added successfully!");
       }
-
       onSaved();
     } catch (error) {
+      toast.error("Error saving tool. Please try again.");
       console.error("Error saving tool:", error);
     } finally {
       setLoading(false);
@@ -130,9 +137,26 @@ const ToolModal: React.FC<ToolModalProps> = ({ isOpen, onClose, onSaved, initial
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 rounded-md shadow transition"
+            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 rounded-md shadow transition flex items-center justify-center"
           >
-            {loading ? "Saving..." : initialData ? "Update Tool" : "Create Tool"}
+            {loading ? (
+              <span className="flex items-center gap-2">
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-black"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                </svg>
+                Saving...
+              </span>
+            ) : initialData ? (
+              "Update Tool"
+            ) : (
+              "Create Tool"
+            )}
           </button>
         </form>
       </div>
