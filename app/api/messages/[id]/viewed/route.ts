@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Message from "@/lib/models/Message";
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   await dbConnect();
   const { id } = params;
   const message = await Message.findByIdAndUpdate(id, { hasViewed: true }, { new: true });
