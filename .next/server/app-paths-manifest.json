@@ -1,11 +1,7 @@
 {
-  "/api/projects/route": "app/api/projects/route.js",
-  "/api/tools/route": "app/api/tools/route.js",
   "/api/resumes/route": "app/api/resumes/route.js",
+  "/api/tools/route": "app/api/tools/route.js",
   "/api/socials/route": "app/api/socials/route.js",
-  "/api/messages/route": "app/api/messages/route.js",
-  "/_not-found/page": "app/_not-found/page.js",
-  "/login/page": "app/login/page.js",
-  "/inbox/page": "app/inbox/page.js",
+  "/api/projects/route": "app/api/projects/route.js",
   "/page": "app/page.js"
 }

@@ -39,41 +39,41 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   cssTransition: () => (/* binding */ cssTransition),
 /* harmony export */   toast: () => (/* binding */ toast)
 /* harmony export */ });
-/* harmony import */ var react_server_dom_webpack_server_edge__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-server-dom-webpack/server.edge */ "(rsc)/./node_modules/next/dist/server/route-modules/app-page/vendored/rsc/react-server-dom-webpack-server-edge.js");
+/* harmony import */ var react_server_dom_webpack_server__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-server-dom-webpack/server */ "(rsc)/./node_modules/next/dist/server/route-modules/app-page/vendored/rsc/react-server-dom-webpack-server.js");
 
-const Bounce = (0,react_server_dom_webpack_server_edge__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
+const Bounce = (0,react_server_dom_webpack_server__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
 function() { throw new Error("Attempted to call Bounce() from the server but Bounce is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component."); },
 "C:\\Users\\stephanie\\Documents\\B550 MCP MERN\\WebPortfolio\\my-portfolio-client\\node_modules\\react-toastify\\dist\\index.mjs",
 "Bounce",
-);const Flip = (0,react_server_dom_webpack_server_edge__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
+);const Flip = (0,react_server_dom_webpack_server__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
 function() { throw new Error("Attempted to call Flip() from the server but Flip is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component."); },
 "C:\\Users\\stephanie\\Documents\\B550 MCP MERN\\WebPortfolio\\my-portfolio-client\\node_modules\\react-toastify\\dist\\index.mjs",
 "Flip",
-);const Icons = (0,react_server_dom_webpack_server_edge__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
+);const Icons = (0,react_server_dom_webpack_server__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
 function() { throw new Error("Attempted to call Icons() from the server but Icons is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component."); },
 "C:\\Users\\stephanie\\Documents\\B550 MCP MERN\\WebPortfolio\\my-portfolio-client\\node_modules\\react-toastify\\dist\\index.mjs",
 "Icons",
-);const Slide = (0,react_server_dom_webpack_server_edge__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
+);const Slide = (0,react_server_dom_webpack_server__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
 function() { throw new Error("Attempted to call Slide() from the server but Slide is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component."); },
 "C:\\Users\\stephanie\\Documents\\B550 MCP MERN\\WebPortfolio\\my-portfolio-client\\node_modules\\react-toastify\\dist\\index.mjs",
 "Slide",
-);const ToastContainer = (0,react_server_dom_webpack_server_edge__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
+);const ToastContainer = (0,react_server_dom_webpack_server__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
 function() { throw new Error("Attempted to call ToastContainer() from the server but ToastContainer is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component."); },
 "C:\\Users\\stephanie\\Documents\\B550 MCP MERN\\WebPortfolio\\my-portfolio-client\\node_modules\\react-toastify\\dist\\index.mjs",
 "ToastContainer",
-);const Zoom = (0,react_server_dom_webpack_server_edge__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
+);const Zoom = (0,react_server_dom_webpack_server__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
 function() { throw new Error("Attempted to call Zoom() from the server but Zoom is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component."); },
 "C:\\Users\\stephanie\\Documents\\B550 MCP MERN\\WebPortfolio\\my-portfolio-client\\node_modules\\react-toastify\\dist\\index.mjs",
 "Zoom",
-);const collapseToast = (0,react_server_dom_webpack_server_edge__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
+);const collapseToast = (0,react_server_dom_webpack_server__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
 function() { throw new Error("Attempted to call collapseToast() from the server but collapseToast is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component."); },
 "C:\\Users\\stephanie\\Documents\\B550 MCP MERN\\WebPortfolio\\my-portfolio-client\\node_modules\\react-toastify\\dist\\index.mjs",
 "collapseToast",
-);const cssTransition = (0,react_server_dom_webpack_server_edge__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
+);const cssTransition = (0,react_server_dom_webpack_server__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
 function() { throw new Error("Attempted to call cssTransition() from the server but cssTransition is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component."); },
 "C:\\Users\\stephanie\\Documents\\B550 MCP MERN\\WebPortfolio\\my-portfolio-client\\node_modules\\react-toastify\\dist\\index.mjs",
 "cssTransition",
-);const toast = (0,react_server_dom_webpack_server_edge__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
+);const toast = (0,react_server_dom_webpack_server__WEBPACK_IMPORTED_MODULE_0__.registerClientReference)(
 function() { throw new Error("Attempted to call toast() from the server but toast is on the client. It's not possible to invoke a client function from the server, it can only be rendered as a Component or passed to props of a Client Component."); },
 "C:\\Users\\stephanie\\Documents\\B550 MCP MERN\\WebPortfolio\\my-portfolio-client\\node_modules\\react-toastify\\dist\\index.mjs",
 "toast",
