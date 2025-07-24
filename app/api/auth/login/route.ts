@@ -11,13 +11,22 @@ export async function POST(request: Request) {
   }
 
   if (email === allowedEmail && password === allowedPassword) {
-    return NextResponse.json({
+    const response = NextResponse.json({
       user: {
         email,
         role: "admin",
       },
       token: "admin-static-token",
     });
+    // Set a secure cookie for authentication
+    response.cookies.set("token", "admin-static-token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+    });
+    return response;
   } else {
     return NextResponse.json({ message: "Unauthorized access" }, { status: 403 });
   }
