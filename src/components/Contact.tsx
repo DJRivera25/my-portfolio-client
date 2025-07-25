@@ -62,8 +62,12 @@ const Contact: React.FC = () => {
       if (isLoggedIn) {
         await fetchUnseenCount();
       }
-    } catch (err) {
-      toast.error("Something went wrong. Try again.");
+    } catch (err: any) {
+      if (err.response && err.response.status === 429) {
+        toast.error(err.response.data.message || "You are sending messages too quickly. Please wait and try again.");
+      } else {
+        toast.error("Something went wrong. Try again.");
+      }
       console.error("Error sending message:", err);
     } finally {
       setSending(false);

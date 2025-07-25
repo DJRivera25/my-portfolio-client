@@ -24,6 +24,15 @@ async function sendMail({ to, subject, html }: { to: string; subject: string; ht
   });
 }
 
+// --- Rate Limiting ---
+const rateLimitMap = new Map<string, number[]>(); // IP -> array of timestamps
+const RATE_LIMIT_WINDOW = 10 * 60 * 1000; // 10 minutes in ms
+const RATE_LIMIT_COUNT = 3; // max 3 messages per window
+
+function getClientIp(req: Request) {
+  return req.headers.get("x-forwarded-for")?.split(",")[0] || req.headers.get("x-real-ip") || "unknown";
+}
+
 export async function GET() {
   await dbConnect();
   const messages = await Message.find();
@@ -31,6 +40,21 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  // Rate limiting logic
+  const ip = getClientIp(request);
+  const now = Date.now();
+  const timestamps = rateLimitMap.get(ip) || [];
+  // Remove timestamps older than window
+  const recent = timestamps.filter((ts) => now - ts < RATE_LIMIT_WINDOW);
+  if (recent.length >= RATE_LIMIT_COUNT) {
+    return NextResponse.json(
+      { message: `Too many requests. Please wait before sending more messages (max 3 every 10 minutes).` },
+      { status: 429 }
+    );
+  }
+  recent.push(now);
+  rateLimitMap.set(ip, recent);
+
   await dbConnect();
   const data = await request.json();
   // Map 'message' to 'content' for model compatibility
