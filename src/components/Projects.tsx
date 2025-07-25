@@ -110,8 +110,7 @@ const Projects: React.FC = () => {
         backgroundColor: darkBlue,
       }}
       initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, type: "spring" }}
     >
       {/* Glowing border accent */}
@@ -145,7 +144,7 @@ const Projects: React.FC = () => {
             <h2 className="text-4xl md:text-5xl font-bold uppercase text-center sm:text-left text-white">Projects</h2>
             {/* Animated glowing divider */}
             <motion.div
-              className="absolute left-1/2 -translate-x-1/2 bottom-[-14px] w-32 h-2 rounded-full"
+              className="sm:absolute left-1/2 sm:-translate-x-1/2 bottom-[-14px] w-32 h-2 rounded-full"
               style={{ background: `linear-gradient(90deg, #FFD600 60%, #fff 100%)`, filter: "blur(2px)" }}
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
@@ -493,8 +492,26 @@ const Projects: React.FC = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3, duration: 0.7, type: "spring" }}
               >
-                <iframe src={resumeUrl} title="My Resume" className="w-full h-[80vh] rounded-md" frameBorder="0" />
+                <iframe
+                  src={resumeUrl}
+                  title="My Resume"
+                  className="w-full h-72 sm:h-[60vh] md:h-[80vh] rounded-md"
+                  frameBorder="0"
+                />
               </motion.div>
+              <div className="text-center mt-4">
+                <a
+                  href={resumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block px-6 py-2 bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-lg shadow transition-all duration-200"
+                >
+                  Download/View Resume
+                </a>
+                <p className="text-white/60 text-xs mt-2">
+                  If the resume is not viewable above, tap the button to open or download it.
+                </p>
+              </div>
             </div>
           ) : (
             <p className="text-white/60 italic text-center mt-12">No resume available</p>

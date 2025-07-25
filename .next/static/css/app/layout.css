@@ -1543,6 +1543,9 @@ video {
 .h-full {
   height: 100%;
 }
+.h-72 {
+  height: 18rem;
+}
 .max-h-\[60vh\] {
   max-height: 60vh;
 }
@@ -2461,12 +2464,25 @@ code {
 }
 @media (min-width: 640px) {
 
+  .sm\:absolute {
+    position: absolute;
+  }
+
   .sm\:h-56 {
     height: 14rem;
   }
 
+  .sm\:h-\[60vh\] {
+    height: 60vh;
+  }
+
   .sm\:max-h-\[70vh\] {
     max-height: 70vh;
+  }
+
+  .sm\:-translate-x-1\/2 {
+    --tw-translate-x: -50%;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
   }
 
   .sm\:grid-cols-2 {
@@ -2521,6 +2537,10 @@ code {
 
   .md\:h-\[400px\] {
     height: 400px;
+  }
+
+  .md\:h-\[80vh\] {
+    height: 80vh;
   }
 
   .md\:max-h-\[80vh\] {
