@@ -250,11 +250,10 @@ const Navbar: React.FC = () => {
             {/* Overlay */}
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.92 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="absolute inset-0 bg-gradient-to-br from-[#0a0f29]/90 via-[#0a0f29]/80 to-black/80 backdrop-blur-md"
-              style={{ background: darkBlue, opacity: 0.92 }}
+              className="absolute inset-0 backdrop-blue-sm "
               onClick={closeMenu}
             />
             {/* Menu Panel */}
@@ -281,7 +280,7 @@ const Navbar: React.FC = () => {
                 </motion.div>
               </motion.button>
               <motion.ul
-                className="flex flex-col gap-8 text-lg font-semibold"
+                className="flex flex-col gap-8 text-lg font-semibold bg-[#0a0f29]/95 rounded-xl p-6 shadow-xl"
                 variants={navListVariants}
                 initial="hidden"
                 animate="show"

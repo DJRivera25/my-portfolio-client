@@ -328,10 +328,10 @@ const Projects: React.FC = () => {
           <p className="text-center text-white/70">Loading projects...</p>
         ) : (
           <motion.div
-            className="columns-1 md:columns-2 gap-8 [column-fill:_balance]"
+            className="grid grid-cols-1 sm:grid-cols-2 gap-6"
             initial="hidden"
             whileInView="show"
-            viewport={{ once: true, amount: 0.2 }}
+            viewport={{ once: true, amount: 0.15 }}
             variants={{
               hidden: {},
               show: { transition: { staggerChildren: 0.13 } },
@@ -340,7 +340,7 @@ const Projects: React.FC = () => {
             {regularProjects.map((project, idx) => (
               <motion.div
                 key={project._id}
-                className="mb-8 break-inside-avoid relative bg-[#0a0f29] border border-white/10 rounded-xl overflow-hidden group shadow-lg"
+                className="mb-6 bg-[#0a0f29] border border-white/10 rounded-xl overflow-hidden group shadow-lg flex flex-col"
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 whileHover={{ y: -8, boxShadow: `0 8px 32px 0 ${yellow}33`, borderColor: yellow }}
@@ -351,7 +351,7 @@ const Projects: React.FC = () => {
                   <motion.img
                     src={project.image}
                     alt={project.title}
-                    className="w-full h-[220px] object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="w-full h-40 sm:h-56 object-cover transition-transform duration-300 group-hover:scale-105"
                     initial={{ scale: 0.98, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.2 + idx * 0.08, duration: 0.7, type: "spring" }}
@@ -360,8 +360,8 @@ const Projects: React.FC = () => {
                   />
                   {/* Overlay on hover */}
                   <motion.div
-                    className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-                    initial={{ opacity: 0 }}
+                    className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-10"
+                    initial={{ opacity: 1 }}
                     whileHover={{ opacity: 1 }}
                   >
                     {project.tags && (
