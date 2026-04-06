@@ -11,15 +11,15 @@ export async function POST(request: Request) {
   }
 
   if (email === allowedEmail && password === allowedPassword) {
+    const token = process.env.ADMIN_API_TOKEN || "admin-static-token";
     const response = NextResponse.json({
       user: {
         email,
         role: "admin",
       },
-      token: "admin-static-token",
+      token,
     });
-    // Set a secure cookie for authentication
-    response.cookies.set("token", "admin-static-token", {
+    response.cookies.set("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

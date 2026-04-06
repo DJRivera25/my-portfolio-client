@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
+import api from "../../src/lib/api/client";
 import { toast } from "react-toastify";
 import { useAuth } from "../../src/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -23,12 +23,16 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("/api/auth/login", form);
+      const res = await api.post<{ token: string }>("/api/auth/login", form);
       login(res.data.token);
       toast.success("Login successful!");
       router.push("/"); // or "/inbox" if you want to redirect to inbox
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Login failed");
+    } catch (err: unknown) {
+      const msg =
+        err && typeof err === "object" && "response" in err
+          ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          : undefined;
+      toast.error(msg || "Login failed");
     } finally {
       setLoading(false);
     }

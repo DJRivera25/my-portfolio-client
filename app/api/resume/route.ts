@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Resume from "@/lib/models/Resume";
 import cloudinary from "@/lib/cloudinary";
+import { isAuthorizedAdmin, unauthorizedResponse } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
+  if (!isAuthorizedAdmin(req)) return unauthorizedResponse();
   await dbConnect();
   const contentType = req.headers.get("content-type") || "";
   if (!contentType.startsWith("multipart/form-data")) {
@@ -41,6 +43,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
+  if (!isAuthorizedAdmin(req)) return unauthorizedResponse();
   await dbConnect();
   const contentType = req.headers.get("content-type") || "";
   if (!contentType.startsWith("multipart/form-data")) {
@@ -83,6 +86,7 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  if (!isAuthorizedAdmin(req)) return unauthorizedResponse();
   await dbConnect();
   const { id } = await req.json();
   const deleted = await Resume.findByIdAndDelete(id);

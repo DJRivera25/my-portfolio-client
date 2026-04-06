@@ -1,8 +1,8 @@
-// src/context/AuthContext.tsx
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
+import api from "../lib/api/client";
+import type { Message } from "../types/portfolio";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -22,12 +22,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
       if (!token) return;
-      const res = await axios.get(`/api/messages`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const unseen = res.data.filter((m: any) => !m.hasViewed).length;
+      const res = await api.get<Message[]>("/api/messages");
+      const unseen = res.data.filter((m) => !m.hasViewed).length;
       setUnseenCount(unseen);
-    } catch (err) {
+    } catch {
       console.error("Failed to fetch unseen messages");
     }
   };
@@ -36,7 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (typeof window !== "undefined") {
       localStorage.setItem("token", token);
       setIsLoggedIn(true);
-      fetchUnseenCount(); // Fetch inbox count after login
+      fetchUnseenCount();
     }
   };
 

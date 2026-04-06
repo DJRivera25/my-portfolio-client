@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import api from "../lib/api/client";
 import { X } from "lucide-react";
 import { toast } from "react-toastify";
+import { TOOL_CATEGORY_OPTIONS } from "../config/toolCategories";
 
 interface Tool {
   _id?: string;
@@ -60,20 +61,10 @@ const ToolModal: React.FC<ToolModalProps> = ({ isOpen, onClose, onSaved, initial
       }
       if (initialData?._id) {
         formData.append("id", initialData._id);
-        await axios.put("/api/tools", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+        await api.put("/api/tools", formData);
         toast.success("Tool updated successfully!");
       } else {
-        await axios.post("/api/tools", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+        await api.post("/api/tools", formData);
         toast.success("Tool added successfully!");
       }
       onSaved();
@@ -112,12 +103,12 @@ const ToolModal: React.FC<ToolModalProps> = ({ isOpen, onClose, onSaved, initial
             className="w-full p-3 rounded-md bg-black/40 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-yellow-500"
             required
           >
-            <option value="">Select Category</option>
-            <option value="frontend">Frontend</option>
-            <option value="backend">Backend</option>
-            <option value="database">Database</option>
-            <option value="devtools">Development Tools</option>
-            <option value="deployment">Deployment & Cloud</option>
+            <option value="">Select category</option>
+            {TOOL_CATEGORY_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
           </select>
 
           <div className="flex items-center gap-4">

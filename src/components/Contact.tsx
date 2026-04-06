@@ -1,23 +1,20 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Plus, Trash2, Pencil } from "lucide-react";
+import api from "../lib/api/client";
+import { Plus, Trash2, Pencil, Mail, Phone } from "lucide-react";
 import SocialModal from "./SocialModal";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import { siteConfig } from "@/lib/site";
+import { contactSectionContent } from "../config/content";
+import type { Social } from "../types/portfolio";
+import { useContactFormSubmission } from "../hooks/useContactFormSubmission";
+import ContactMessageForm from "./ContactMessageForm";
 
 const yellow = "#FFD600";
-const lightBg = "#f7fafc";
 const darkBlue = "#0a0f29";
-
-interface Social {
-  _id?: string;
-  platform: string;
-  icon: string;
-  url: string;
-}
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -28,22 +25,16 @@ const Contact: React.FC = () => {
   const [socials, setSocials] = useState<Social[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editSocial, setEditSocial] = useState<Social | null>(null);
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [sending, setSending] = useState(false);
   const [hoveredSocial, setHoveredSocial] = useState<string | null>(null);
   const [loadingSocials, setLoadingSocials] = useState(true);
 
-  const { isLoggedIn, fetchUnseenCount } = useAuth();
+  const { isLoggedIn } = useAuth();
+  const { form, sending, handleSubmit, handleFieldChange } = useContactFormSubmission();
 
   const fetchSocials = async () => {
     try {
-      const res = await axios.get("/api/socials");
+      const res = await api.get<Social[]>("/api/socials");
       setSocials(res.data);
     } catch (err) {
       console.error("Error fetching socials:", err);
@@ -52,35 +43,11 @@ const Contact: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setSending(true);
-    try {
-      await axios.post("/api/messages", form);
-      toast.success("Message sent successfully!");
-      setForm({ name: "", email: "", subject: "", message: "" });
-      if (isLoggedIn) {
-        await fetchUnseenCount();
-      }
-    } catch (err: any) {
-      if (err.response && err.response.status === 429) {
-        toast.error(err.response.data.message || "You are sending messages too quickly. Please wait and try again.");
-      } else {
-        toast.error("Something went wrong. Try again.");
-      }
-      console.error("Error sending message:", err);
-    } finally {
-      setSending(false);
-    }
-  };
-
   const handleDelete = async (id: string) => {
     if (!window.confirm("Delete this social link?")) return;
     setDeletingId(id);
     try {
-      await axios.delete(`/api/socials/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      await api.delete(`/api/socials/${id}`);
       setSocials((prev) => prev.filter((s) => s._id !== id));
       toast.success("Social link deleted successfully!");
     } catch (err) {
@@ -124,12 +91,10 @@ const Contact: React.FC = () => {
           className="flex-1 flex flex-col justify-between min-w-[320px] max-w-md relative"
         >
           <div>
-            <h3 className="text-3xl font-bold mb-4 text-white tracking-wide drop-shadow-lg">Get in touch with Me</h3>
-            <p className="mb-6 leading-relaxed text-white/80 text-lg max-w-md drop-shadow">
-              If you have a project in mind, a question to ask, or just want to connect, I’d love to hear from you.
-            </p>
+            <h3 className="text-3xl font-bold mb-4 text-white tracking-wide drop-shadow-lg">{contactSectionContent.heading}</h3>
+            <p className="mb-6 leading-relaxed text-white/80 text-lg max-w-md drop-shadow">{contactSectionContent.subhead}</p>
             <div className="h-1 w-24 bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-400 rounded-full mb-6" />
-            <h4 className="text-xl font-semibold mb-3 text-yellow-400 tracking-wider">Follow Me:</h4>
+            <h4 className="text-xl font-semibold mb-3 text-yellow-400 tracking-wider">{contactSectionContent.followLabel}</h4>
             {isLoggedIn && (
               <motion.button
                 onClick={() => openModal()}
@@ -254,117 +219,36 @@ const Contact: React.FC = () => {
             {/* Email & Phone */}
             <div className="mt-6 space-y-4 text-white/90 text-lg">
               <div className="flex items-center gap-3">
-                <svg
-                  className="w-5 h-5 text-yellow-400"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M4 4h16v16H4z" stroke="none" />
-                  <path d="M4 4l8 8 8-8" />
-                </svg>
-                <span className="break-all">djrrivera25@gmail.com</span>
+                <Mail className="w-5 h-5 text-yellow-400 shrink-0" aria-hidden />
+                <a href={`mailto:${siteConfig.contact.email}`} className="break-all hover:text-yellow-300 transition-colors">
+                  {siteConfig.contact.email}
+                </a>
               </div>
               <div className="flex items-center gap-3">
-                <svg
-                  className="w-5 h-5 text-yellow-400"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M22 16.92V20a2 2 0 0 1-2.18 2A19.75 19.75 0 0 1 2 4.18 2 2 0 0 1 4 2h3.09a2 2 0 0 1 2 1.72 12.1 12.1 0 0 0 .57 2.57 2 2 0 0 1-.45 2.11L8 10a16 16 0 0 0 6 6l1.6-1.21a2 2 0 0 1 2.11-.45 12.1 12.1 0 0 0 2.57.57A2 2 0 0 1 22 16.92z" />
-                </svg>
-                <span>+63 933 851 8806</span>
+                <Phone className="w-5 h-5 text-yellow-400 shrink-0" aria-hidden />
+                <a href={siteConfig.contact.phoneHref} className="hover:text-yellow-300 transition-colors">
+                  {siteConfig.contact.phone}
+                </a>
               </div>
             </div>
           </div>
         </motion.div>
         {/* Right Form - Layered, no card */}
-        <motion.form
-          onSubmit={handleSubmit}
-          className="w-full max-w-xl mx-auto space-y-6 flex-1 min-w-[320px] relative flex flex-col justify-center"
+        <motion.div
+          className="w-full max-w-xl mx-auto flex-1 min-w-[320px] relative flex flex-col justify-center"
           initial={{ opacity: 0, x: 30 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, type: "spring" }}
         >
-          <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-32 bg-yellow-400/10 blur-2xl rounded-full z-0" />
-          <motion.input
-            type="text"
-            placeholder="Enter Your Name"
-            className="w-full border-b-2 bg-transparent text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-lg"
-            value={form.name}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, name: e.target.value })}
-            required
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.5 }}
+          <ContactMessageForm
+            form={form}
+            onFieldChange={handleFieldChange}
+            onSubmit={handleSubmit}
+            sending={sending}
+            animated
           />
-          <motion.input
-            type="email"
-            placeholder="Your Email Address"
-            className="w-full border-b-2 bg-transparent text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-lg"
-            value={form.email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, email: e.target.value })}
-            required
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-          />
-          <motion.input
-            type="text"
-            placeholder="Subject"
-            className="w-full border-b-2 bg-transparent text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-lg"
-            value={form.subject}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, subject: e.target.value })}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-          />
-          <motion.textarea
-            placeholder="Write me a message"
-            rows={6}
-            className="w-full border-b-2 bg-transparent text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-lg"
-            value={form.message}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setForm({ ...form, message: e.target.value })}
-            required
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-          ></motion.textarea>
-          <motion.button
-            type="submit"
-            className="border border-yellow-400 px-8 py-3 text-white bg-yellow-400 hover:bg-yellow-300 hover:text-black font-bold rounded-full transition flex items-center justify-center relative overflow-hidden shadow-lg mt-4"
-            disabled={sending}
-            whileHover={{ scale: 1.04, boxShadow: `0 0 16px 2px ${yellow}` }}
-            whileTap={{ scale: 0.97 }}
-          >
-            {sending ? (
-              <span className="flex items-center gap-2">
-                <svg
-                  className="animate-spin h-5 w-5 mr-2 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                </svg>
-                Sending...
-              </span>
-            ) : (
-              "Submit"
-            )}
-            <motion.span
-              className="absolute inset-0 rounded-full"
-              initial={{ opacity: 0 }}
-              whileTap={{ opacity: 0.2, scale: 1.2, background: yellow }}
-              transition={{ duration: 0.3 }}
-            />
-          </motion.button>
-        </motion.form>
+        </motion.div>
       </div>
       {/* Modal */}
       <SocialModal

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import axios from "axios";
+import api from "../lib/api/client";
 import { X } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -34,12 +34,7 @@ const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose, onSaved }) =
     try {
       const formData = new FormData();
       formData.append("resume", resumeFile);
-      await axios.post("/api/resume", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      await api.post("/api/resume", formData);
       toast.success("Resume uploaded successfully!");
       onSaved();
     } catch (err) {

@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Message from "@/lib/models/Message";
+import { isAuthorizedAdmin, unauthorizedResponse } from "@/lib/auth";
 
 export async function PATCH(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  if (!isAuthorizedAdmin(req)) return unauthorizedResponse();
   const params = await props.params;
   await dbConnect();
   const { id } = params;

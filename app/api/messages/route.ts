@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Message from "@/lib/models/Message";
 import nodemailer from "nodemailer";
+import { isAuthorizedAdmin, unauthorizedResponse } from "@/lib/auth";
 
 const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASS = process.env.EMAIL_PASS;
@@ -33,9 +34,10 @@ function getClientIp(req: Request) {
   return req.headers.get("x-forwarded-for")?.split(",")[0] || req.headers.get("x-real-ip") || "unknown";
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  if (!isAuthorizedAdmin(request)) return unauthorizedResponse();
   await dbConnect();
-  const messages = await Message.find();
+  const messages = await Message.find().sort({ createdAt: -1 });
   return NextResponse.json(messages);
 }
 
@@ -113,6 +115,7 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  if (!isAuthorizedAdmin(request)) return unauthorizedResponse();
   await dbConnect();
   const { id, ...update } = await request.json();
   const updated = await Message.findByIdAndUpdate(id, update, { new: true });
@@ -123,6 +126,7 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  if (!isAuthorizedAdmin(request)) return unauthorizedResponse();
   await dbConnect();
   const { id } = await request.json();
   const deleted = await Message.findByIdAndDelete(id);

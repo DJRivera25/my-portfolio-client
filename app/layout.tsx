@@ -5,35 +5,49 @@ import { AuthProvider } from "../src/context/AuthContext";
 import type { ReactNode } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Montserrat } from "next/font/google";
+import { siteConfig } from "@/lib/site";
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-montserrat",
+});
 
 export const metadata = {
-  title: "Derem Joshua | Web Developer",
-  description: "Portfolio of Derem Joshua, a full stack web developer",
+  metadataBase: new URL(siteConfig.ogUrl),
+  title: {
+    default: siteConfig.title,
+    template: `%s | ${siteConfig.shortName}`,
+  },
+  description: siteConfig.description,
+  openGraph: {
+    title: siteConfig.title,
+    description: siteConfig.description,
+    url: siteConfig.ogUrl,
+    siteName: siteConfig.name,
+    images: [{ url: "/thumbnail.png", width: 1200, height: 630, alt: siteConfig.name }],
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: ["/thumbnail.png"],
+  },
+  icons: {
+    icon: "/my-photo.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="icon" href="/my-photo.png" type="image/png" />
-        <title>Derem Joshua | Web Developer</title>
-        <meta name="description" content="Portfolio of Derem Joshua, a full stack web developer" />
-        {/* Open Graph tags for social sharing */}
-        <meta property="og:title" content="Derem Joshua | Web Developer" />
-        <meta property="og:description" content="Portfolio of Derem Joshua, a full stack web developer" />
-        <meta property="og:image" content="/thumbnail.png" />
-        <meta property="og:url" content="https://my-portfolio-client-one.vercel.app/" />
-        <meta property="og:type" content="website" />
-        {/* Twitter Card tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Derem Joshua | Web Developer" />
-        <meta name="twitter:description" content="Portfolio of Derem Joshua, a full stack web developer" />
-        <meta name="twitter:image" content="/thumbnail.png" />
-      </head>
-      <body className="font-[Montserrat] bg-white text-gray-900">
+    <html lang="en" className={montserrat.variable}>
+      <body className={`${montserrat.className} bg-white text-gray-900 antialiased`}>
         <AuthProvider>
           <Navbar />
-          <ToastContainer position="top-right" autoClose={3000} />
+          <ToastContainer position="top-right" autoClose={3000} theme="dark" />
           {children}
           <Footer />
         </AuthProvider>

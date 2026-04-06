@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import api from "../lib/api/client";
 import { X } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -60,20 +60,10 @@ const SocialModal: React.FC<SocialModalProps> = ({ isOpen, onClose, onSaved, ini
       }
       if (initialData?._id) {
         formData.append("id", initialData._id);
-        await axios.put("/api/socials", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+        await api.put("/api/socials", formData);
         toast.success("Social link updated successfully!");
       } else {
-        await axios.post("/api/socials", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+        await api.post("/api/socials", formData);
         toast.success("Social link added successfully!");
       }
       onSaved();

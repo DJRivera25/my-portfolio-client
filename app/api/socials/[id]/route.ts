@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Social from "@/lib/models/Social";
 import cloudinary from "@/lib/cloudinary";
+import { isAuthorizedAdmin, unauthorizedResponse } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
@@ -20,6 +21,7 @@ export async function GET(req: NextRequest, props: { params: Promise<{ id: strin
 }
 
 export async function PUT(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  if (!isAuthorizedAdmin(req)) return unauthorizedResponse();
   const params = await props.params;
   await dbConnect();
   try {
@@ -65,6 +67,7 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
 }
 
 export async function DELETE(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  if (!isAuthorizedAdmin(req)) return unauthorizedResponse();
   const params = await props.params;
   await dbConnect();
   try {

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Resume from "@/lib/models/Resume";
+import { isAuthorizedAdmin, unauthorizedResponse } from "@/lib/auth";
 
 export async function GET() {
   await dbConnect();
@@ -9,6 +10,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (!isAuthorizedAdmin(request)) return unauthorizedResponse();
   await dbConnect();
   const data = await request.json();
   const resume = await Resume.create(data);
@@ -16,6 +18,7 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  if (!isAuthorizedAdmin(request)) return unauthorizedResponse();
   await dbConnect();
   const { id, ...update } = await request.json();
   const updated = await Resume.findByIdAndUpdate(id, update, { new: true });
@@ -26,6 +29,7 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  if (!isAuthorizedAdmin(request)) return unauthorizedResponse();
   await dbConnect();
   const { id } = await request.json();
   const deleted = await Resume.findByIdAndDelete(id);

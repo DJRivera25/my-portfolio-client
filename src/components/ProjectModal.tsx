@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
+import api from "../lib/api/client";
 import { X } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -63,17 +63,11 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
       if (imageFile) {
         formData.append("image", imageFile);
       }
-      const config = {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      };
       if (initialData?._id) {
-        await axios.put(`/api/projects/${initialData._id}`, formData, config);
+        await api.put(`/api/projects/${initialData._id}`, formData);
         toast.success("Project updated successfully!");
       } else {
-        await axios.post("/api/projects", formData, config);
+        await api.post("/api/projects", formData);
         toast.success("Project added successfully!");
       }
       onSaved();

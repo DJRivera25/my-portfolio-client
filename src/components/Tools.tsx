@@ -1,22 +1,18 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Plus, Trash2, Pencil } from "lucide-react";
 import ToolModal from "./ToolModal";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import api from "../lib/api/client";
+import { useAuth } from "../context/AuthContext";
+import type { Tool } from "../types/portfolio";
+import { toolsSectionContent } from "../config/content";
+import { formatToolCategoryLabel, sortToolCategoryEntries } from "../config/toolCategories";
 
-const darkBlue = "#0a0f29";
 const yellow = "#FFD600";
 const lightBg = "#f7fafc";
-
-interface Tool {
-  _id?: string;
-  name: string;
-  icon: string;
-  category: string;
-}
 
 const groupByCategory = (tools: Tool[]) => {
   const grouped: Record<string, Tool[]> = {};
@@ -45,15 +41,13 @@ const itemVariants = {
 const Tools: React.FC = () => {
   const [tools, setTools] = useState<Tool[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const { isLoggedIn: isAdmin } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editTool, setEditTool] = useState<Tool | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [hoveredTool, setHoveredTool] = useState<string | null>(null);
-
   const fetchTools = async () => {
     try {
-      const res = await axios.get("/api/tools");
+      const res = await api.get<Tool[]>("/api/tools");
       setTools(res.data);
     } catch (err) {
       console.error("Error fetching tools:", err);
@@ -63,20 +57,15 @@ const Tools: React.FC = () => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsAdmin(!!token);
     fetchTools();
   }, []);
 
   const handleDelete = async (id: string) => {
-    const confirm = window.confirm("Delete this tool?");
-    if (!confirm) return;
+    const ok = window.confirm("Delete this tool?");
+    if (!ok) return;
     setDeletingId(id);
     try {
-      await axios.delete("/api/tools", {
-        data: { id },
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      await api.delete("/api/tools", { data: { id } });
       setTools((prev) => prev.filter((tool) => tool._id !== id));
       toast.success("Tool deleted successfully!");
     } catch (error) {
@@ -93,34 +82,34 @@ const Tools: React.FC = () => {
   };
 
   const groupedTools = groupByCategory(tools);
+  const sortedCategoryEntries = sortToolCategoryEntries(Object.entries(groupedTools));
+
   return (
     <motion.section
       id="tools"
-      className="py-20 bg-cover bg-center text-[#0a0f29] relative mx-auto sm:px-20"
+      className="py-section-sm md:py-section bg-cover bg-center text-brand-navy relative mx-auto px-4 sm:px-8 lg:px-20"
       style={{ background: lightBg }}
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.8, type: "spring" }}
     >
-      {/* Glowing border accent */}
       <div className="absolute left-0 right-0 top-0 h-1 pointer-events-none z-10" style={{ filter: "blur(4px)" }}>
         <div className="w-full h-full bg-gradient-to-r from-yellow-400/60 via-yellow-200/40 to-yellow-400/60" />
       </div>
-      <div className="container mx-auto px-4 relative z-10">
-        {/* Header */}
+      <div className="container mx-auto px-4 relative z-10 max-w-7xl">
         <motion.div
-          className={`flex flex-col sm:flex-row ${isAdmin ? "justify-between" : "justify-center"} items-center gap-4 mb-12`}
+          className={`flex flex-col sm:flex-row ${isAdmin ? "justify-between" : "justify-center"} items-center gap-4 mb-12 text-center sm:text-left`}
           initial={{ opacity: 0, y: -30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, type: "spring" }}
         >
-          <div className="relative">
-            <h2 className="text-4xl font-bold text-[#0a0f29] text-center">TOOLS & TECHNOLOGIES</h2>
-            {/* Animated glowing divider */}
+          <div className="relative max-w-2xl">
+            <h2 className="text-3xl md:text-4xl font-bold text-brand-navy">{toolsSectionContent.heading}</h2>
+            <p className="mt-2 text-brand-navy/70 text-sm md:text-base">{toolsSectionContent.subhead}</p>
             <motion.div
-              className="absolute left-1/2 -translate-x-1/2 bottom-[-10px] w-24 h-2 rounded-full"
+              className="absolute left-1/2 sm:left-0 -translate-x-1/2 sm:translate-x-0 bottom-[-10px] w-24 h-2 rounded-full mx-auto sm:mx-0 mt-4 sm:mt-0"
               style={{ background: yellow, filter: "blur(2px)" }}
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
@@ -129,20 +118,13 @@ const Tools: React.FC = () => {
           </div>
           {isAdmin && (
             <motion.button
+              type="button"
               onClick={() => openModal()}
-              className="flex gap-2 items-center bg-yellow-400 hover:bg-yellow-300 text-black px-4 py-2 rounded shadow transition font-bold relative overflow-hidden"
+              className="flex gap-2 items-center bg-yellow-400 hover:bg-yellow-300 text-black px-4 py-2 rounded-lg shadow transition font-bold"
               whileHover={{ scale: 1.06, boxShadow: `0 0 16px 2px ${yellow}` }}
               whileTap={{ scale: 0.96 }}
             >
-              <span className="relative z-10 flex items-center">
-                <Plus className="w-4 h-4" /> Add Tool
-              </span>
-              <motion.span
-                className="absolute inset-0 rounded"
-                initial={{ opacity: 0 }}
-                whileTap={{ opacity: 0.2, scale: 1.2, background: yellow }}
-                transition={{ duration: 0.3 }}
-              />
+              <Plus className="w-4 h-4" /> Add tool
             </motion.button>
           )}
         </motion.div>
@@ -165,6 +147,10 @@ const Tools: React.FC = () => {
               </div>
             ))}
           </div>
+        ) : tools.length === 0 ? (
+          <p className="text-center text-brand-navy/70 py-16 border border-dashed border-brand-navy/20 rounded-2xl bg-white/60">
+            {toolsSectionContent.empty}
+          </p>
         ) : (
           <motion.div
             variants={containerVariants}
@@ -173,94 +159,63 @@ const Tools: React.FC = () => {
             viewport={{ once: true, amount: 0.2 }}
             className="grid md:grid-cols-3 gap-12 text-center"
           >
-            {Object.entries(groupedTools).map(([category, items]) => (
+            {sortedCategoryEntries.map(([category, items]) => (
               <div key={category}>
                 <motion.h3
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.1 }}
-                  className="text-2xl font-semibold mb-6 text-yellow-500 capitalize"
+                  className="text-2xl font-semibold mb-6 text-yellow-600"
                 >
-                  {category}
+                  {formatToolCategoryLabel(category)}
                 </motion.h3>
                 <div className="flex flex-wrap justify-center gap-4">
-                  {items.map((tool, i) => (
+                  {items.map((tool) => (
                     <motion.div
                       key={tool._id}
                       variants={itemVariants}
-                      whileHover={{ scale: 1.13, boxShadow: `0 0 32px 0 ${yellow}55` }}
-                      className="relative w-20 h-20 rounded-full shadow-lg flex items-center justify-center bg-white group border-2 border-yellow-400/20 hover:border-yellow-400 transition-all duration-300"
-                      tabIndex={0}
-                      onMouseEnter={() => setHoveredTool(tool._id!)}
-                      onMouseLeave={() => setHoveredTool(null)}
+                      whileHover={{ scale: 1.06, boxShadow: `0 0 24px 0 ${yellow}40` }}
+                      className="relative flex flex-col items-center gap-2 w-[5.5rem]"
                     >
-                      <img
-                        src={tool.icon}
-                        alt={tool.name}
-                        className="w-14 h-14 rounded-full object-contain group-hover:scale-110 transition-transform"
-                        title={tool.name}
-                      />
-                      {/* Animated tooltip/label */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: hoveredTool === tool._id ? 1 : 0, y: hoveredTool === tool._id ? -30 : 10 }}
-                        transition={{ duration: 0.3 }}
-                        className="absolute left-1/2 -translate-x-1/2 top-0 mt-2 px-3 py-1 bg-yellow-400 text-black text-xs font-bold rounded shadow-lg pointer-events-none z-40"
-                        style={{ whiteSpace: "nowrap" }}
-                      >
+                      <div className="relative w-20 h-20 rounded-full shadow-lg flex items-center justify-center bg-white border-2 border-yellow-400/25 hover:border-yellow-400 transition-all duration-300">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={tool.icon}
+                          alt=""
+                          className="w-14 h-14 rounded-full object-contain"
+                        />
+                        {isAdmin && (
+                          <div className="absolute -top-1 -right-1 flex gap-0.5 z-30">
+                            <motion.button
+                              type="button"
+                              onClick={() => handleDelete(tool._id)}
+                              className="p-0.5 rounded-full text-red-500 hover:text-red-700 border border-white shadow bg-white/95"
+                              disabled={deletingId === tool._id}
+                              whileTap={{ scale: 0.92 }}
+                              aria-label="Delete tool"
+                            >
+                              {deletingId === tool._id ? (
+                                <span className="inline-block h-3 w-3 border-2 border-red-400 border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <Trash2 size={12} />
+                              )}
+                            </motion.button>
+                            <motion.button
+                              type="button"
+                              onClick={() => openModal(tool)}
+                              className="p-0.5 rounded-full text-blue-600 hover:text-blue-800 border border-white shadow bg-white/95"
+                              whileTap={{ scale: 0.92 }}
+                              aria-label="Edit tool"
+                            >
+                              <Pencil size={12} />
+                            </motion.button>
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-[11px] sm:text-xs font-medium text-brand-navy/85 text-center leading-snug px-0.5 max-h-[2.5rem] overflow-hidden min-h-[2.5rem] flex items-start justify-center">
                         {tool.name}
-                      </motion.div>
-                      {isAdmin && (
-                        <div className="absolute -top-2 -right-2 flex gap-1 z-30">
-                          <motion.button
-                            onClick={() => handleDelete(tool._id!)}
-                            className="p-1 rounded-full text-red-400 hover:text-red-600 border border-white shadow relative overflow-hidden"
-                            disabled={deletingId === tool._id}
-                            whileTap={{ scale: 0.92 }}
-                          >
-                            {deletingId === tool._id ? (
-                              <svg
-                                className="animate-spin h-4 w-4 text-red-400"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                              >
-                                <circle
-                                  className="opacity-25"
-                                  cx="12"
-                                  cy="12"
-                                  r="10"
-                                  stroke="currentColor"
-                                  strokeWidth="4"
-                                ></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                              </svg>
-                            ) : (
-                              <Trash2 size={14} />
-                            )}
-                            <motion.span
-                              className="absolute inset-0 rounded-full"
-                              initial={{ opacity: 0 }}
-                              whileTap={{ opacity: 0.2, scale: 1.2, background: "#dc2626" }}
-                              transition={{ duration: 0.3 }}
-                            />
-                          </motion.button>
-                          <motion.button
-                            onClick={() => openModal(tool)}
-                            className="p-1 rounded-full text-blue-400 hover:text-blue-600 border border-white shadow relative overflow-hidden"
-                            whileTap={{ scale: 0.92 }}
-                          >
-                            <Pencil size={14} />
-                            <motion.span
-                              className="absolute inset-0 rounded-full"
-                              initial={{ opacity: 0 }}
-                              whileTap={{ opacity: 0.2, scale: 1.2, background: "#2563eb" }}
-                              transition={{ duration: 0.3 }}
-                            />
-                          </motion.button>
-                        </div>
-                      )}
+                      </span>
                     </motion.div>
                   ))}
                 </div>
@@ -270,7 +225,6 @@ const Tools: React.FC = () => {
         )}
       </div>
 
-      {/* Tool Modal */}
       <ToolModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
