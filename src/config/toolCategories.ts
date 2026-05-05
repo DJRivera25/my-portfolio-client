@@ -1,24 +1,22 @@
 /** Tool section categories — keep ToolModal options and Tools headings in sync. */
 
 export const TOOL_CATEGORY_OPTIONS = [
-  { value: "frontend", label: "Frontend" },
-  { value: "backend", label: "Backend" },
-  { value: "database", label: "Database" },
-  { value: "devtools", label: "Development tools" },
-  { value: "deployment", label: "Deployment & cloud" },
-  { value: "integrations", label: "Third-party APIs & integrations" },
+  { value: "languages", label: "Languages" },
+  { value: "frameworks", label: "Frameworks" },
+  { value: "data", label: "Data" },
+  { value: "devops", label: "DevOps" },
+  { value: "ai-workflow", label: "AI Workflow" },
 ] as const;
 
 export type ToolCategoryValue = (typeof TOOL_CATEGORY_OPTIONS)[number]["value"];
 
 /** Display order for section columns (unknown categories sort last, alphabetically). */
 export const TOOL_CATEGORY_ORDER: readonly string[] = [
-  "frontend",
-  "backend",
-  "database",
-  "devtools",
-  "deployment",
-  "integrations",
+  "languages",
+  "frameworks",
+  "data",
+  "devops",
+  "ai-workflow",
 ];
 
 export function formatToolCategoryLabel(category: string): string {

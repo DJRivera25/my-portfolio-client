@@ -5,6 +5,10 @@ export interface Project {
   link: string;
   image: string;
   featured?: boolean;
+  tags?: string[];
+  year?: number;
+  role?: string;
+  mobileImage?: string;
 }
 
 export interface Tool {

@@ -4,8 +4,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import type { ContactFormState } from "../hooks/useContactFormSubmission";
 
-const yellow = "#FFD600";
-
 type ContactMessageFormProps = {
   form: ContactFormState;
   onFieldChange: (field: keyof ContactFormState, value: string) => void;
@@ -16,8 +14,26 @@ type ContactMessageFormProps = {
   className?: string;
 };
 
-const inputClass =
-  "w-full border-b-2 border-white/30 bg-transparent text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-base sm:text-lg";
+const fieldClass =
+  "w-full rounded-lg border border-hairline-strong bg-brand-navy/40 px-4 py-3 text-sm text-white placeholder:text-white/40 transition focus:border-accent-cyan focus:bg-brand-navy/60 focus:outline-none focus:ring-1 focus:ring-accent-cyan";
+
+const submitClass =
+  "inline-flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-bold uppercase tracking-wide text-brand-navy shadow-brand-glow transition hover:bg-accent-hover disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent";
+
+function Spinner() {
+  return (
+    <svg
+      className="animate-spin h-4 w-4"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+    </svg>
+  );
+}
 
 export default function ContactMessageForm({
   form,
@@ -31,13 +47,12 @@ export default function ContactMessageForm({
     return (
       <form
         onSubmit={onSubmit}
-        className={`relative flex flex-col justify-center space-y-5 sm:space-y-6 ${className}`}
+        className={`flex flex-col space-y-4 ${className}`}
       >
-        <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-32 h-32 bg-yellow-400/10 blur-2xl rounded-full z-0 pointer-events-none" />
         <motion.input
           type="text"
           placeholder="Enter Your Name"
-          className={inputClass}
+          className={fieldClass}
           value={form.name}
           onChange={(e) => onFieldChange("name", e.target.value)}
           required
@@ -48,7 +63,7 @@ export default function ContactMessageForm({
         <motion.input
           type="email"
           placeholder="Your Email Address"
-          className={inputClass}
+          className={fieldClass}
           value={form.email}
           onChange={(e) => onFieldChange("email", e.target.value)}
           required
@@ -59,7 +74,7 @@ export default function ContactMessageForm({
         <motion.input
           type="text"
           placeholder="Subject"
-          className={inputClass}
+          className={fieldClass}
           value={form.subject}
           onChange={(e) => onFieldChange("subject", e.target.value)}
           initial={{ opacity: 0, y: 20 }}
@@ -69,7 +84,7 @@ export default function ContactMessageForm({
         <motion.textarea
           placeholder="Write me a message"
           rows={6}
-          className={inputClass}
+          className={`${fieldClass} resize-none`}
           value={form.message}
           onChange={(e) => onFieldChange("message", e.target.value)}
           required
@@ -77,47 +92,26 @@ export default function ContactMessageForm({
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         />
-        <motion.button
-          type="submit"
-          className="border border-yellow-400 px-8 py-3 text-white bg-yellow-400 hover:bg-yellow-300 hover:text-black font-bold rounded-full transition flex items-center justify-center relative overflow-hidden shadow-lg mt-2"
-          disabled={sending}
-          whileHover={{ scale: 1.04, boxShadow: `0 0 16px 2px ${yellow}` }}
-          whileTap={{ scale: 0.97 }}
-        >
+        <button type="submit" className={submitClass} disabled={sending}>
           {sending ? (
-            <span className="flex items-center gap-2">
-              <svg
-                className="animate-spin h-5 w-5 mr-2 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-              </svg>
-              Sending...
-            </span>
+            <>
+              <Spinner />
+              <span>Sending...</span>
+            </>
           ) : (
             "Submit"
           )}
-          <motion.span
-            className="absolute inset-0 rounded-full"
-            initial={{ opacity: 0 }}
-            whileTap={{ opacity: 0.2, scale: 1.2, background: yellow }}
-            transition={{ duration: 0.3 }}
-          />
-        </motion.button>
+        </button>
       </form>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} className={`relative flex flex-col space-y-4 sm:space-y-5 ${className}`}>
-      <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-28 h-28 bg-yellow-400/10 blur-2xl rounded-full pointer-events-none" />
+    <form onSubmit={onSubmit} className={`flex flex-col space-y-4 ${className}`}>
       <input
         type="text"
         placeholder="Enter Your Name"
-        className={inputClass}
+        className={fieldClass}
         value={form.name}
         onChange={(e) => onFieldChange("name", e.target.value)}
         required
@@ -125,7 +119,7 @@ export default function ContactMessageForm({
       <input
         type="email"
         placeholder="Your Email Address"
-        className={inputClass}
+        className={fieldClass}
         value={form.email}
         onChange={(e) => onFieldChange("email", e.target.value)}
         required
@@ -133,31 +127,24 @@ export default function ContactMessageForm({
       <input
         type="text"
         placeholder="Subject"
-        className={inputClass}
+        className={fieldClass}
         value={form.subject}
         onChange={(e) => onFieldChange("subject", e.target.value)}
       />
       <textarea
         placeholder="Write me a message"
         rows={5}
-        className={inputClass}
+        className={`${fieldClass} resize-none`}
         value={form.message}
         onChange={(e) => onFieldChange("message", e.target.value)}
         required
       />
-      <button
-        type="submit"
-        className="mt-1 border border-yellow-400 px-6 py-3 text-black bg-yellow-400 hover:bg-yellow-300 font-bold rounded-full transition flex items-center justify-center shadow-lg disabled:opacity-70"
-        disabled={sending}
-      >
+      <button type="submit" className={submitClass} disabled={sending}>
         {sending ? (
-          <span className="flex items-center gap-2 text-black">
-            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-            </svg>
-            Sending...
-          </span>
+          <>
+            <Spinner />
+            <span>Sending...</span>
+          </>
         ) : (
           "Submit"
         )}

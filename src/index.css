@@ -5,6 +5,8 @@
 :root {
   --color-brand-navy: #0a0f29;
   --color-accent: #ffd600;
+  --color-accent-cyan: #00e0ff;
+  --color-accent-violet: #8a6dff;
   --nav-offset: 5rem;
 }
 
@@ -23,17 +25,17 @@
       scroll-behavior: auto;
     }
   }
-}
-
-body {
-  margin: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  body {
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
 /* Anchor targets clear fixed navbar */
 #landing,
 #about,
+#process,
 #projects,
 #resume,
 #tools,
@@ -42,7 +44,17 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* Aurora ambient blobs respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-aurora-drift {
+    animation: none !important;
+  }
+  .animate-pulse-soft {
+    animation: none !important;
+  }
 }
 
 /* Skeleton shimmer — respect reduced motion */
@@ -69,4 +81,12 @@ code {
   .shimmer::after {
     animation: none;
   }
+}
+
+/* Faint grid overlay used by AuroraBackdrop */
+.aurora-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
 }

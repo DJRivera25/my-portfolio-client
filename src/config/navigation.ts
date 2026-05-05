@@ -4,8 +4,8 @@ export type NavItem = { to: string; label: string };
 export const navLinks: NavItem[] = [
   { to: "landing", label: "Home" },
   { to: "about", label: "About" },
+  { to: "process", label: "Process" },
   { to: "projects", label: "Projects" },
-  { to: "resume", label: "Resume" },
   { to: "tools", label: "Tools" },
   { to: "contact", label: "Contact" },
 ];

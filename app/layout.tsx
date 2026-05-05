@@ -5,14 +5,9 @@ import { AuthProvider } from "../src/context/AuthContext";
 import type { ReactNode } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Montserrat } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import { siteConfig } from "@/lib/site";
-
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-montserrat",
-});
 
 export const metadata = {
   metadataBase: new URL(siteConfig.ogUrl),
@@ -36,15 +31,13 @@ export const metadata = {
     description: siteConfig.description,
     images: ["/thumbnail.png"],
   },
-  icons: {
-    icon: "/my-photo.png",
-  },
+  icons: { icon: "/my-photo.png" },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={montserrat.variable}>
-      <body className={`${montserrat.className} bg-white text-gray-900 antialiased`}>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+      <body className="font-sans bg-brand-navy text-white antialiased">
         <AuthProvider>
           <Navbar />
           <ToastContainer position="top-right" autoClose={3000} theme="dark" />

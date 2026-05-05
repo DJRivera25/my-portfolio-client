@@ -20,7 +20,6 @@ const Navbar: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
   const reduceMotion = useReducedMotion();
-  const [hovered, setHovered] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<string>(navLinks[0].to);
   const navRefs = useRef<{ [key: string]: HTMLLIElement | null }>({});
@@ -102,7 +101,7 @@ const Navbar: React.FC = () => {
         setUnderlineProps({ left: rect.left - parentRect.left, width: rect.width });
       }
     }
-  }, [activeSection, hovered, isOpen]);
+  }, [activeSection, isOpen]);
 
   useEffect(() => {
     if (!isOpen || typeof document === "undefined") return;
@@ -113,153 +112,117 @@ const Navbar: React.FC = () => {
     };
   }, [isOpen]);
 
-  const navListVariants = {
-    hidden: {},
-    show: {
-      transition: { staggerChildren: 0.08, delayChildren: 0.1 },
-    },
-  };
-  const navItemVariants = {
-    hidden: { opacity: 0, y: -10 },
-    show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 200 } },
-  };
-
   return (
     <motion.nav
       initial={{ y: -40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.7, ease: "easeOut" }}
-      className={`fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-brand-navy/80 transition-all duration-300 ${scrolled ? "shadow-2xl" : "shadow-lg"}`}
-      style={{
-        boxShadow: scrolled ? "0 8px 32px 0 rgba(10,15,41,0.35)" : "0 4px 24px 0 rgba(10,15,41,0.25)",
-      }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className={`fixed top-0 left-0 z-50 w-full backdrop-blur-glass transition-all duration-300 ${scrolled ? "bg-brand-navy/85 border-b border-hairline" : "bg-brand-navy/40"}`}
       role="navigation"
       aria-label="Main navigation"
     >
-      <div
-        className="absolute left-0 right-0 bottom-0 h-0.5 lg:h-1 pointer-events-none z-50"
-        style={{ filter: "blur(4px)" }}
-      >
-        <div className="w-full h-full bg-gradient-to-r from-yellow-400/60 via-yellow-200/40 to-yellow-400/60" />
-      </div>
-      <div className="container mx-auto flex min-h-0 justify-between items-center gap-3 py-3.5 px-4 sm:px-5 lg:py-5 lg:px-6 relative max-w-7xl">
-        <motion.button
+      <div className="container relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6 lg:py-4">
+        <button
           type="button"
-          whileTap={{ scale: 0.98 }}
-          animate={{ scale: scrolled ? 0.96 : 1 }}
-          transition={{ type: "spring", stiffness: 300 }}
-          className="group flex min-w-0 items-center gap-2.5 sm:gap-3 cursor-pointer bg-transparent border-0 p-0 text-left rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-navy shrink"
+          className="group flex items-center gap-2.5 rounded-lg p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
           onClick={handleLogoClick}
           onKeyDown={handleLogoKeyDown}
           aria-label={`${siteConfig.name} — go to home`}
         >
-          <span className="inline-flex h-10 w-10 shrink-0 rounded-full border-2 border-yellow-400 shadow-sm overflow-hidden transition-transform duration-200 ease-out group-hover:scale-105 sm:h-11 sm:w-11">
+          <span className="inline-flex h-9 w-9 shrink-0 overflow-hidden rounded-full border border-hairline-strong">
             <Image
               src={myPhoto}
               alt=""
-              width={44}
-              height={44}
+              width={40}
+              height={40}
               className="h-full w-full rounded-full object-cover"
             />
           </span>
-          <span className="text-xl font-extrabold text-white tracking-widest transition-colors duration-200 group-hover:text-yellow-200 sm:text-2xl">
+          <span className="text-base font-bold tracking-tight text-white transition group-hover:text-accent-cyan sm:text-lg">
             {siteConfig.shortName}
           </span>
-        </motion.button>
+        </button>
 
-        <motion.ul
-          className="hidden lg:flex gap-10 font-semibold text-base tracking-wide uppercase items-center relative"
-          variants={navListVariants}
-          initial="hidden"
-          animate="show"
-        >
+        <ul className="relative hidden items-center gap-8 lg:flex">
           <motion.div
-            className="absolute top-full h-2 rounded-full pointer-events-none"
+            className="absolute -bottom-2 h-px rounded-full pointer-events-none"
             style={{
               left: underlineProps.left,
               width: underlineProps.width,
-              background: `linear-gradient(90deg, #FFD600 60%, #fff 100%)`,
-              boxShadow: `0 2px 16px 0 #FFD60099`,
-              filter: "blur(0.5px)",
+              background: "linear-gradient(90deg, transparent, #00E0FF, transparent)",
+              boxShadow: "0 0 10px rgba(0, 224, 255, 0.6)",
             }}
-            transition={{ type: "spring" as const, stiffness: 400, damping: 30 }}
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
             layout
           />
           {navLinks.map(({ to, label }) => (
-            <motion.li
+            <li
               key={to}
               ref={(el: HTMLLIElement | null) => {
                 navRefs.current[to] = el;
               }}
               className="relative"
-              variants={navItemVariants}
               aria-current={activeSection === to ? "page" : undefined}
             >
               <button
                 type="button"
                 onClick={() => handleNavClick(to)}
-                className={`cursor-pointer px-2 py-1 transition-colors text-white hover:text-yellow-400 focus:text-yellow-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 ${activeSection === to ? "font-bold" : ""}`}
-                onMouseEnter={() => setHovered(to)}
-                onMouseLeave={() => setHovered(null)}
-                style={{ letterSpacing: hovered === to ? "0.08em" : undefined, transition: "letter-spacing 0.2s" }}
+                className={`text-eyebrow uppercase transition focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan rounded ${activeSection === to ? "text-white" : "text-white/55 hover:text-white"}`}
                 aria-label={label}
               >
                 {label}
               </button>
-            </motion.li>
+            </li>
           ))}
           {isLoggedIn && (
-            <motion.li variants={navItemVariants}>
-              <motion.button
+            <li>
+              <button
                 type="button"
                 onClick={() => router.push("/inbox")}
-                className="relative px-4 py-2 rounded-lg bg-transparent text-white hover:text-yellow-400 transition font-semibold focus-visible:ring-2 focus-visible:ring-yellow-400 overflow-hidden"
-                whileTap={{ scale: 0.95 }}
+                className="relative text-eyebrow uppercase text-white/70 transition hover:text-accent-cyan"
                 aria-label="Inbox"
               >
-                <span className="relative z-10">Inbox</span>
+                Inbox
                 {unseenCount > 0 && (
-                  <span className="absolute -top-2 -right-3 bg-yellow-400 text-black text-xs px-2 py-0.5 rounded-full font-bold shadow">
+                  <span className="absolute -top-2 -right-3 rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-bold text-brand-navy">
                     {unseenCount}
                   </span>
                 )}
-              </motion.button>
-            </motion.li>
+              </button>
+            </li>
           )}
           {isLoggedIn && (
-            <motion.li variants={navItemVariants}>
-              <motion.button
+            <li>
+              <button
                 type="button"
                 onClick={handleLogout}
-                className="ml-4 px-5 py-2 bg-yellow-400 hover:bg-yellow-300 text-black text-base font-bold rounded-lg shadow transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
-                whileTap={{ scale: 0.95 }}
+                className="rounded-lg border border-hairline-strong bg-surface-glass px-3 py-1.5 text-eyebrow uppercase text-white transition hover:border-accent-cyan hover:text-accent-cyan"
                 aria-label="Logout"
               >
                 Logout
-              </motion.button>
-            </motion.li>
+              </button>
+            </li>
           )}
-        </motion.ul>
+        </ul>
 
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3 lg:hidden">
+        <div className="flex shrink-0 items-center gap-2 lg:hidden">
           <button
             type="button"
             onClick={() => setContactModalOpen(true)}
-            className="rounded-lg bg-yellow-400 px-3 py-2.5 text-sm font-semibold leading-snug text-black shadow-md transition hover:bg-yellow-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-200 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-navy sm:px-4 sm:text-[0.9375rem]"
+            className="rounded-lg bg-accent px-3 py-2 text-xs font-bold uppercase tracking-wide text-brand-navy shadow-brand-glow transition hover:bg-accent-hover"
             aria-label={heroContent.primaryCta}
           >
             {heroContent.primaryCta}
           </button>
-          <motion.button
+          <button
             type="button"
             onClick={handleToggle}
-            className="text-white -mr-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
-            whileTap={{ scale: 0.95 }}
+            className="flex h-10 w-10 items-center justify-center rounded-lg border border-hairline-strong text-white transition hover:border-accent-cyan focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
             aria-label={isOpen ? "Close menu" : "Open menu"}
             aria-expanded={isOpen}
           >
-            {isOpen ? <X size={26} strokeWidth={2.25} /> : <Menu size={26} strokeWidth={2.25} />}
-          </motion.button>
+            {isOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
       </div>
 
@@ -272,7 +235,7 @@ const Navbar: React.FC = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-md lg:hidden"
+              className="fixed inset-0 z-[100] bg-brand-navy/80 backdrop-blur-glass lg:hidden"
               onClick={closeMenu}
               aria-hidden
             />
@@ -282,37 +245,35 @@ const Navbar: React.FC = () => {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", stiffness: 400, damping: 38 }}
-              className="fixed top-0 right-0 z-[110] flex h-[100dvh] w-[min(88vw,20rem)] flex-col bg-brand-navy shadow-[-8px_0_32px_rgba(0,0,0,0.35)] lg:hidden"
+              className="fixed top-0 right-0 z-[110] flex h-[100dvh] w-[min(85vw,18rem)] flex-col border-l border-hairline-strong bg-brand-navy shadow-2xl lg:hidden"
               role="dialog"
               aria-modal="true"
               aria-label="Mobile navigation"
             >
-              <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-4 py-3">
-                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-white/50">Menu</span>
+              <div className="flex shrink-0 items-center justify-between border-b border-hairline px-4 py-3">
+                <span className="text-eyebrow uppercase text-white/55">Menu</span>
                 <button
                   type="button"
                   onClick={closeMenu}
-                  className="rounded-lg p-2 text-white transition hover:bg-white/10 hover:text-yellow-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+                  className="rounded-lg p-2 text-white transition hover:text-accent-cyan focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
                   aria-label="Close menu"
                 >
-                  <X size={24} strokeWidth={2} />
+                  <X size={22} />
                 </button>
               </div>
 
-              <nav className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-3 pb-4 pt-2">
-                <ul className="flex flex-col gap-0.5">
+              <nav className="flex min-h-0 flex-1 flex-col overflow-y-auto px-3 py-4">
+                <ul className="flex flex-col gap-1">
                   {navLinks.map(({ to, label }) => (
                     <li key={to} aria-current={activeSection === to ? "page" : undefined}>
                       <button
                         type="button"
                         onClick={() => handleNavClick(to)}
-                        className={`flex w-full items-center rounded-xl px-3 py-3 text-left text-base font-semibold tracking-wide transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 focus-visible:ring-inset ${
+                        className={`flex w-full items-center rounded-xl px-3 py-3 text-left text-sm font-semibold uppercase tracking-wide transition focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan ${
                           activeSection === to
-                            ? "bg-white/10 text-yellow-300"
-                            : "text-white hover:bg-white/5 hover:text-yellow-300"
+                            ? "bg-surface-glass text-accent-cyan"
+                            : "text-white/70 hover:bg-surface-glass hover:text-white"
                         }`}
-                        onMouseEnter={() => setHovered(to)}
-                        onMouseLeave={() => setHovered(null)}
                       >
                         {label}
                       </button>
@@ -321,19 +282,19 @@ const Navbar: React.FC = () => {
                 </ul>
 
                 {isLoggedIn && (
-                  <div className="mt-4 border-t border-white/10 pt-3">
+                  <div className="mt-4 border-t border-hairline pt-3">
                     <button
                       type="button"
                       onClick={() => {
                         router.push("/inbox");
                         closeMenu();
                       }}
-                      className="flex w-full items-center justify-between gap-3 rounded-xl px-3 py-3 text-left text-base font-semibold text-white transition hover:bg-white/5 hover:text-yellow-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 focus-visible:ring-inset"
+                      className="flex w-full items-center justify-between rounded-xl px-3 py-3 text-left text-sm font-semibold text-white/80 transition hover:bg-surface-glass hover:text-accent-cyan"
                       aria-label="Inbox"
                     >
                       <span>Inbox</span>
                       {unseenCount > 0 && (
-                        <span className="inline-flex min-h-[1.5rem] min-w-[1.5rem] shrink-0 items-center justify-center rounded-full bg-yellow-400 px-2 text-xs font-bold text-black tabular-nums">
+                        <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-brand-navy">
                           {unseenCount > 99 ? "99+" : unseenCount}
                         </span>
                       )}
@@ -343,14 +304,14 @@ const Navbar: React.FC = () => {
               </nav>
 
               {isLoggedIn && (
-                <div className="shrink-0 border-t border-white/10 bg-brand-navy/95 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
+                <div className="shrink-0 border-t border-hairline px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
                   <button
                     type="button"
                     onClick={() => {
                       handleLogout();
                       closeMenu();
                     }}
-                    className="w-full rounded-xl bg-yellow-400 px-4 py-3.5 text-left text-base font-bold text-black shadow-md transition hover:bg-yellow-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-200 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-navy"
+                    className="w-full rounded-xl bg-accent px-4 py-3 text-sm font-bold text-brand-navy shadow-brand-glow transition hover:bg-accent-hover"
                     aria-label="Logout"
                   >
                     Logout

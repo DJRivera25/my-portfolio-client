@@ -2,9 +2,9 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import api from "../lib/api/client";
-import { X } from "lucide-react";
 import { toast } from "react-toastify";
 import { TOOL_CATEGORY_OPTIONS } from "../config/toolCategories";
+import ModalFrame from "./ui/ModalFrame";
 
 interface Tool {
   _id?: string;
@@ -76,82 +76,70 @@ const ToolModal: React.FC<ToolModalProps> = ({ isOpen, onClose, onSaved, initial
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center px-4">
-      <div className="bg-[#0a0f29] w-full max-w-lg rounded-2xl shadow-xl p-6 relative border border-white/10">
-        <button onClick={onClose} className="absolute top-4 right-4 text-white hover:text-yellow-400 transition">
-          <X size={24} />
-        </button>
+    <ModalFrame
+      isOpen={isOpen}
+      onClose={onClose}
+      eyebrow="Tool"
+      title={initialData ? "Edit tool" : "Add tool"}
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          type="text"
+          placeholder="Tool name"
+          className="w-full rounded-lg border border-hairline-strong bg-brand-navy/40 px-4 py-3 text-sm text-white placeholder:text-white/40 transition focus:border-accent-cyan focus:outline-none focus:ring-1 focus:ring-accent-cyan"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
 
-        <h2 className="text-2xl font-bold text-yellow-400 mb-6">{initialData ? "Edit Tool" : "Add Tool"}</h2>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          required
+          className="w-full rounded-lg border border-hairline-strong bg-brand-navy/40 px-4 py-3 text-sm text-white transition focus:border-accent-cyan focus:outline-none focus:ring-1 focus:ring-accent-cyan"
+        >
+          <option value="" style={{ background: "#0a0f29", color: "white" }}>Select category</option>
+          {TOOL_CATEGORY_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value} style={{ background: "#0a0f29", color: "white" }}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Tool Name"
-            className="w-full p-3 rounded-md bg-black/40 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full p-3 rounded-md bg-black/40 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            required
-          >
-            <option value="">Select category</option>
-            {TOOL_CATEGORY_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-medium rounded shadow"
-            >
-              {iconFile || preview ? "Change Icon" : "Upload Icon"}
-            </button>
-            {preview && (
-              <img src={preview} alt="Preview" className="w-12 h-12 rounded-full border object-contain bg-white" />
-            )}
-            <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
-          </div>
-
+        <div className="flex items-center gap-3">
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 rounded-md shadow transition flex items-center justify-center"
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="rounded-lg border border-hairline-strong bg-surface-glass px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white transition hover:border-accent-cyan hover:text-accent-cyan"
           >
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <svg
-                  className="animate-spin h-5 w-5 mr-2 text-black"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                </svg>
-                Saving...
-              </span>
-            ) : initialData ? (
-              "Update Tool"
-            ) : (
-              "Create Tool"
-            )}
+            {iconFile || preview ? "Change icon" : "Upload icon"}
           </button>
-        </form>
-      </div>
-    </div>
+          {preview && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={preview} alt="Preview" className="h-12 w-12 rounded-lg border border-hairline-strong object-cover bg-white/5" />
+          )}
+          <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-bold uppercase tracking-wide text-brand-navy shadow-brand-glow transition hover:bg-accent-hover disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {loading ? (
+            <>
+              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" />
+              Saving…
+            </>
+          ) : initialData ? (
+            "Update tool"
+          ) : (
+            "Create tool"
+          )}
+        </button>
+      </form>
+    </ModalFrame>
   );
 };
 
