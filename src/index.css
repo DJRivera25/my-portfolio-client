@@ -2,20 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-    "Helvetica Neue", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+:root {
+  --color-brand-navy: #0a0f29;
+  --color-accent: #ffd600;
+  --color-accent-cyan: #00e0ff;
+  --color-accent-violet: #8a6dff;
+  --nav-offset: 5rem;
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --nav-offset: 4.25rem;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+  body {
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Anchor targets clear fixed navbar */
+#landing,
+#about,
+#process,
+#projects,
+#resume,
+#tools,
+#contact {
+  scroll-margin-top: var(--nav-offset);
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-/* Skeleton shimmer effect for loading states */
+/* Aurora ambient blobs respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-aurora-drift {
+    animation: none !important;
+  }
+  .animate-pulse-soft {
+    animation: none !important;
+  }
+}
+
+/* Skeleton shimmer — respect reduced motion */
 .shimmer {
   position: relative;
   overflow: hidden;
@@ -34,4 +76,17 @@ code {
   100% {
     left: 100%;
   }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shimmer::after {
+    animation: none;
+  }
+}
+
+/* Faint grid overlay used by AuroraBackdrop */
+.aurora-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
 }

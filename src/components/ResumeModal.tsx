@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import axios from "axios";
-import { X } from "lucide-react";
+import api from "../lib/api/client";
 import { toast } from "react-toastify";
+import ModalFrame from "./ui/ModalFrame";
 
 interface ResumeModalProps {
   isOpen: boolean;
@@ -34,12 +34,7 @@ const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose, onSaved }) =
     try {
       const formData = new FormData();
       formData.append("resume", resumeFile);
-      await axios.post("/api/resume", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      await api.post("/api/resume", formData);
       toast.success("Resume uploaded successfully!");
       onSaved();
     } catch (err) {
@@ -50,65 +45,47 @@ const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose, onSaved }) =
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center px-4">
-      <div className="bg-[#0a0f29] w-full max-w-lg rounded-2xl shadow-xl p-6 relative border border-white/10">
-        <button onClick={onClose} className="absolute top-4 right-4 text-white hover:text-yellow-400 transition">
-          <X size={24} />
-        </button>
-
-        <h2 className="text-2xl font-bold text-yellow-400 mb-6">Upload Resume</h2>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-medium rounded shadow"
-            >
-              {previewName ? "Change File" : "Upload PDF"}
-            </button>
-            {previewName && (
-              <p className="text-white/80 text-sm truncate max-w-xs" title={previewName}>
-                {previewName}
-              </p>
-            )}
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept="application/pdf"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </div>
-
+    <ModalFrame isOpen={isOpen} onClose={onClose} eyebrow="Resume" title="Upload resume">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="flex items-center gap-3">
           <button
-            type="submit"
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 rounded-md shadow transition flex items-center justify-center"
-            disabled={loading}
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="rounded-lg border border-hairline-strong bg-surface-glass px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white transition hover:border-accent-cyan hover:text-accent-cyan"
           >
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <svg
-                  className="animate-spin h-5 w-5 mr-2 text-black"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                </svg>
-                Uploading...
-              </span>
-            ) : (
-              "Upload Resume"
-            )}
+            {previewName ? "Change file" : "Upload PDF"}
           </button>
-        </form>
-      </div>
-    </div>
+          {previewName && (
+            <p className="truncate text-sm text-white/70 max-w-xs" title={previewName}>
+              {previewName}
+            </p>
+          )}
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="application/pdf"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading || !resumeFile}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-bold uppercase tracking-wide text-brand-navy shadow-brand-glow transition hover:bg-accent-hover disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {loading ? (
+            <>
+              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" />
+              Uploading…
+            </>
+          ) : (
+            "Upload resume"
+          )}
+        </button>
+      </form>
+    </ModalFrame>
   );
 };
 
