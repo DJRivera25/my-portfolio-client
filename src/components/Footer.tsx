@@ -36,6 +36,9 @@ const Footer: React.FC = () => {
     });
   };
 
+  // The home route renders its own Atelier site footer.
+  if (pathname === "/") return null;
+
   return (
     <motion.footer
       initial={{ opacity: 0, y: 20 }}

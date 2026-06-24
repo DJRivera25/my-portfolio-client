@@ -39,7 +39,10 @@
 #projects,
 #resume,
 #tools,
-#contact {
+#contact,
+#hero,
+#work,
+#stack {
   scroll-margin-top: var(--nav-offset);
 }
 
@@ -89,4 +92,199 @@ code {
     linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
   background-size: 32px 32px;
+}
+
+/* ============================================================
+   Atelier — "The Build Log" design system
+   ============================================================ */
+::selection {
+  background: rgba(224, 165, 61, 0.28);
+  color: #f2efe8;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@keyframes floatUp {
+  from { opacity: 0; transform: translateY(34px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes travel {
+  from { transform: translateX(-130%); }
+  to { transform: translateX(320%); }
+}
+@keyframes travelV {
+  from { transform: translateY(-130%); }
+  to { transform: translateY(320%); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes drawerIn {
+  from { transform: translateX(50px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes pulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(224, 165, 61, 0.45); }
+  70% { box-shadow: 0 0 0 10px rgba(224, 165, 61, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(224, 165, 61, 0); }
+}
+@keyframes spinSlow {
+  from { transform: rotate(0); }
+  to { transform: rotate(360deg); }
+}
+
+/* Staggered entrance for hero lines */
+.atelier-reveal {
+  animation: floatUp 0.9s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+/* Hide scrollbar on the cinematic work track */
+.atelier-track::-webkit-scrollbar { display: none; }
+.atelier-track {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch; /* momentum on iOS */
+  overscroll-behavior-x: contain; /* don't trigger page/back-gesture while swiping */
+}
+
+/* Atelier form inputs */
+.atelier-input:focus,
+.atelier-textarea:focus {
+  border-bottom-color: #e0a53d !important;
+}
+
+/* Disable cursor glow on touch devices */
+@media (hover: none) {
+  .atelier-glow-layer { display: none !important; }
+}
+
+/* Respect reduced motion across Atelier animations */
+@media (prefers-reduced-motion: reduce) {
+  .atelier-reveal,
+  [class*="animate-marquee"],
+  [class*="animate-travel"],
+  [class*="animate-float-up"],
+  [class*="animate-spin-slow"],
+  [class*="animate-pulse-ring"] {
+    animation: none !important;
+  }
+}
+
+/* Off-screen clone styling used while capturing the résumé blocks for the PDF.
+   Single column at a fixed width so every block is full-width and uniform. */
+.resume-pdf-mode {
+  width: 760px !important;
+  max-width: 760px !important;
+}
+.resume-pdf-mode .resume-sheet-frame {
+  width: 760px !important;
+  max-width: 760px !important;
+  min-height: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+.resume-pdf-mode .resume-pad {
+  padding: 0 20px !important;
+}
+.resume-pdf-mode .resume-grid,
+.resume-pdf-mode .resume-freelance-grid {
+  grid-template-columns: 1fr !important;
+  gap: 0 !important;
+}
+.resume-pdf-mode .resume-exp-list {
+  padding-left: 0 !important;
+}
+.resume-pdf-mode .resume-tl-line,
+.resume-pdf-mode .resume-tl-dot,
+.resume-pdf-mode .resume-stack-sheet {
+  display: none !important;
+}
+.resume-pdf-mode .resume-page-2 {
+  margin-top: 0 !important;
+}
+.resume-pdf-mode .resume-contact {
+  text-align: right !important;
+}
+
+/* Print only the coded résumé — WYSIWYG, letter size (Ctrl+P fallback) */
+@media print {
+  /* margin:0 removes the browser's default header/footer (URL, date, page numbers);
+     the sheet's own padding provides the visual margins. */
+  @page {
+    size: letter portrait;
+    margin: 0;
+  }
+  html,
+  body {
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  /* hide toasts / any portals outside the portfolio root */
+  .Toastify {
+    display: none !important;
+  }
+  /* show ONLY the résumé section out of the whole page (collapses all other height) */
+  #portfolio-root > * {
+    display: none !important;
+  }
+  #portfolio-root > #resume {
+    display: block !important;
+    border: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  #resume > div {
+    max-width: none !important;
+    margin: 0 !important;
+  }
+  /* drop the dark on-page header (eyebrow + Download button) from the print */
+  .resume-screen-header {
+    display: none !important;
+  }
+  #resume-print {
+    max-width: none !important;
+    margin: 0 !important;
+  }
+  /* keep the cream paper, gold bar, dots and chip fills in the printed PDF */
+  #resume-print,
+  #resume-print * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .resume-sheet-frame {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    min-height: 0 !important;
+  }
+  .resume-stack-sheet {
+    display: none !important;
+  }
+  .resume-page-2 {
+    margin-top: 0 !important;
+    break-before: page;
+  }
+  /* force the desktop layout in the PDF (print width ~816px would trigger the mobile rules) */
+  .resume-pad {
+    padding: 56px 60px !important;
+  }
+  .resume-grid {
+    grid-template-columns: 1.55fr 1fr !important;
+    gap: 46px !important;
+  }
+  .resume-freelance-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .resume-contact {
+    text-align: right !important;
+  }
 }

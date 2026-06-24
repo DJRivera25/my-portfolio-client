@@ -9,6 +9,31 @@ export interface Project {
   year?: number;
   role?: string;
   mobileImage?: string;
+  /** Case-study fields ("The Build Log" presentation) */
+  tagline?: string;
+  kind?: string;
+  problem?: string;
+  solution?: string;
+  highlights?: string[];
+}
+
+/** Presentation view-model for the "Selected Work" cinematic track + case-study drawer. */
+export interface CaseStudy {
+  id: string;
+  no: string;
+  year: string;
+  kind: string;
+  dot: string;
+  title: string;
+  tagline: string;
+  image: string;
+  stack: string[];
+  role: string;
+  problem: string;
+  solution: string;
+  highlights: string[];
+  link: string;
+  statusLabel: string;
 }
 
 export interface Tool {
@@ -16,6 +41,7 @@ export interface Tool {
   name: string;
   category: string;
   icon: string;
+  description?: string;
 }
 
 export interface Social {

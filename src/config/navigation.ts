@@ -1,12 +1,12 @@
 export type NavItem = { to: string; label: string };
 
-/** Section ids must match element `id` attributes on the home page. */
+/** Section ids must match element `id` attributes on the home page (Atelier redesign). */
 export const navLinks: NavItem[] = [
-  { to: "landing", label: "Home" },
+  { to: "hero", label: "Home" },
+  { to: "work", label: "Work" },
   { to: "about", label: "About" },
+  { to: "stack", label: "Stack" },
   { to: "process", label: "Process" },
-  { to: "projects", label: "Projects" },
-  { to: "tools", label: "Tools" },
   { to: "contact", label: "Contact" },
 ];
 

@@ -1,8 +1,47 @@
 {
-  "node_modules\\next\\dist\\client\\dev\\hot-reloader\\app\\use-websocket.js -> @vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts": {
-    "id": "node_modules\\next\\dist\\client\\dev\\hot-reloader\\app\\use-websocket.js -> @vercel/turbopack-ecmascript-runtime/browser/dev/hmr-client/hmr-client.ts",
+  "node_modules\\jspdf\\dist\\jspdf.es.min.js -> canvg": {
+    "id": 34137,
     "files": [
-      "static/chunks/_app-pages-browser_node_modules_next_dist_client_dev_noop-turbopack-hmr_js.js"
+      "static/chunks/bc98253f.ce50eee70995d8cd.js",
+      "static/chunks/121.991963838bfc92a5.js"
+    ]
+  },
+  "node_modules\\jspdf\\dist\\jspdf.es.min.js -> dompurify": {
+    "id": 10822,
+    "files": [
+      "static/chunks/822.e5a25ff0c78b4017.js"
+    ]
+  },
+  "node_modules\\jspdf\\dist\\jspdf.es.min.js -> html2canvas": {
+    "id": 52699,
+    "files": [
+      "static/chunks/ad2866b8.cd79d7af4b304d7a.js"
+    ]
+  },
+  "node_modules\\next\\dist\\client\\index.js -> ../pages/_app": {
+    "id": 90472,
+    "files": [
+      "static/chunks/472.04a8725c923ee78b.js"
+    ]
+  },
+  "node_modules\\next\\dist\\client\\index.js -> ../pages/_error": {
+    "id": 99341,
+    "files": [
+      "static/chunks/341.a54acfc8ae065595.js"
+    ]
+  },
+  "src\\components\\portfolio\\ResumeSection.tsx -> html2canvas": {
+    "id": 52699,
+    "files": [
+      "static/chunks/ad2866b8.cd79d7af4b304d7a.js"
+    ]
+  },
+  "src\\components\\portfolio\\ResumeSection.tsx -> jspdf": {
+    "id": 26597,
+    "files": [
+      "static/chunks/2f0b94e8.83b1f03c8ea295dd.js",
+      "static/chunks/164f4fb6.79ca9e7b39adcf5f.js",
+      "static/chunks/399.84b9a9a72019ebee.js"
     ]
   }
 }
