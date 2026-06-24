@@ -11,6 +11,12 @@ const ProjectSchema = new Schema(
     year: { type: Number },
     role: { type: String },
     mobileImage: { type: String },
+    // Case-study fields ("The Build Log" presentation)
+    tagline: { type: String },
+    kind: { type: String },
+    problem: { type: String },
+    solution: { type: String },
+    highlights: { type: [String], default: [] },
   },
   { timestamps: true }
 );

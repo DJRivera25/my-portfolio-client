@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *{ box-sizing:border-box; }
+    html,body{ margin:0; padding:0; background:#0C0C0E; }
+    ::selection{ background:rgba(224,165,61,0.28); color:#ECEAE3; }
+  </style>
+</helmet>
+
+<div ref="{{ rootRef }}" style="--accent:#E0A53D; --ink:#0C0C0E; --paper:#ECEAE3; background:#0C0C0E; color:#ECEAE3; font-family:'Space Grotesk',sans-serif; min-height:100vh; -webkit-font-smoothing:antialiased; position:relative; overflow:hidden;">
+
+  <!-- baseline grid overlay -->
+  <sc-if value="{{ showGrid }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:90; pointer-events:none; background-image:linear-gradient(90deg, rgba(224,165,61,0.10) 1px, transparent 1px); background-size:calc((100% ) / 12) 100%; mix-blend-mode:screen;"></div>
+  </sc-if>
+
+  <!-- ===== MASTHEAD ===== -->
+  <header style="max-width:1180px; margin:0 auto; padding:72px 48px 0;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:24px; border-bottom:1px solid rgba(255,255,255,0.10); padding-bottom:40px;">
+      <div>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:34px;">
+          <div style="width:30px; height:30px; border:1px solid var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center;">
+            <div style="width:11px; height:11px; background:var(--accent); border-radius:50%;"></div>
+          </div>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.22em; text-transform:uppercase; color:#A7A39B;">Atelier — Design System</span>
+        </div>
+        <h1 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:clamp(52px,8vw,108px); line-height:0.94; letter-spacing:-0.01em; margin:0; color:#ECEAE3;">The system<br>behind <span style="font-style:italic; color:var(--accent);">the work</span>.</h1>
+        <p style="max-width:540px; margin:30px 0 0; font-size:16px; line-height:1.65; color:#A7A39B;">A documented design language for the portfolio of Derem Joshua Rivera — built for consistency, restraint, and craft. Every color, type ramp, and component below is a reusable decision.</p>
+      </div>
+      <div style="text-align:right; flex-shrink:0; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.1em; color:#6E6B64; line-height:2;">
+        <div>VERSION&nbsp;&nbsp;1.0</div>
+        <div>UPDATED&nbsp;&nbsp;2026</div>
+        <div>AUTHOR&nbsp;&nbsp;&nbsp;DJ</div>
+      </div>
+    </div>
+    <!-- index -->
+    <nav style="display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.08); border-top:none; margin-bottom:0;">
+      <sc-for list="{{ indexItems }}" as="ix" hint-placeholder-count="8">
+        <div style="background:#0C0C0E; padding:18px 20px; display:flex; flex-direction:column; gap:6px;">
+          <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent); letter-spacing:0.1em;">{{ ix.no }}</span>
+          <span style="font-size:14px; color:#ECEAE3; font-weight:500;">{{ ix.label }}</span>
+        </div>
+      </sc-for>
+    </nav>
+  </header>
+
+  <main style="max-width:1180px; margin:0 auto; padding:0 48px 120px;">
+
+    <!-- ===== 01 PRINCIPLES ===== -->
+    <section style="padding:96px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex; align-items:baseline; gap:18px; margin-bottom:54px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent); letter-spacing:0.1em;">01</span>
+        <h2 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:38px; margin:0; color:#ECEAE3;">Principles</h2>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.08);">
+        <sc-for list="{{ principles }}" as="p" hint-placeholder-count="4">
+          <div style="background:#0C0C0E; padding:38px 34px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6E6B64; letter-spacing:0.18em; margin-bottom:22px;">{{ p.tag }}</div>
+            <h3 style="font-family:'Instrument Serif',serif; font-weight:400; font-style:italic; font-size:27px; margin:0 0 14px; color:var(--accent);">{{ p.title }}</h3>
+            <p style="margin:0; font-size:15px; line-height:1.65; color:#A7A39B;">{{ p.body }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- ===== 02 COLOR ===== -->
+    <section style="padding:96px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex; align-items:baseline; gap:18px; margin-bottom:18px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent); letter-spacing:0.1em;">02</span>
+        <h2 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:38px; margin:0; color:#ECEAE3;">Color</h2>
+      </div>
+      <p style="max-width:520px; margin:0 0 48px; font-size:15px; line-height:1.65; color:#A7A39B;">A warm near-black foundation, paper-white type, and a single matured gold — the brand's heritage yellow, grown up. Color is used sparingly; the accent earns attention because it's rare.</p>
+
+      <!-- ink ramp -->
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.18em; color:#6E6B64; margin-bottom:16px;">FOUNDATION</div>
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:48px;">
+        <sc-for list="{{ inkSwatches }}" as="s" hint-placeholder-count="4">
+          <div>
+            <div style="height:120px; border-radius:3px; border:1px solid rgba(255,255,255,0.08); background:{{ s.bg }};"></div>
+            <div style="margin-top:12px; font-size:13px; color:#ECEAE3; font-weight:500;">{{ s.name }}</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6E6B64; margin-top:3px;">{{ s.hex }}</div>
+            <div style="font-size:11px; color:#6E6B64; margin-top:4px;">{{ s.role }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <!-- text + accent -->
+      <div style="display:grid; grid-template-columns:1.4fr 1fr; gap:14px;">
+        <div style="border:1px solid rgba(255,255,255,0.08); border-radius:3px; padding:34px; display:flex; flex-direction:column; justify-content:space-between; min-height:200px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.18em; color:#6E6B64;">TEXT ON INK</div>
+          <div>
+            <div style="font-size:22px; color:#ECEAE3; margin-bottom:8px;">Paper&nbsp;&nbsp;<span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#6E6B64;">#ECEAE3</span></div>
+            <div style="font-size:18px; color:#A7A39B; margin-bottom:8px;">Muted&nbsp;&nbsp;<span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#6E6B64;">#A7A39B</span></div>
+            <div style="font-size:15px; color:#6E6B64;">Faint&nbsp;&nbsp;<span style="font-family:'JetBrains Mono',monospace; font-size:12px;">#6E6B64</span></div>
+          </div>
+        </div>
+        <div style="border-radius:3px; padding:34px; display:flex; flex-direction:column; justify-content:space-between; min-height:200px; background:var(--accent);">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.18em; color:rgba(12,12,14,0.55);">SIGNATURE ACCENT</div>
+          <div>
+            <div style="font-family:'Instrument Serif',serif; font-style:italic; font-size:34px; color:#0C0C0E; line-height:1;">Gilt Gold</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:rgba(12,12,14,0.65); margin-top:8px;">#E0A53D · accent / live · ≤8% of surface</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 03 TYPOGRAPHY ===== -->
+    <section style="padding:96px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex; align-items:baseline; gap:18px; margin-bottom:18px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent); letter-spacing:0.1em;">03</span>
+        <h2 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:38px; margin:0; color:#ECEAE3;">Typography</h2>
+      </div>
+      <p style="max-width:520px; margin:0 0 48px; font-size:15px; line-height:1.65; color:#A7A39B;">A three-voice system: an editorial serif for expression, a geometric grotesk for interface and reading, and a monospace for technical signal — labels, code, and metadata.</p>
+
+      <div style="display:flex; flex-direction:column; gap:1px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.08);">
+        <!-- serif -->
+        <div style="background:#0C0C0E; padding:40px 34px; display:grid; grid-template-columns:200px 1fr; gap:30px; align-items:center;">
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.14em; color:var(--accent); margin-bottom:10px;">DISPLAY</div>
+            <div style="font-size:14px; color:#ECEAE3; font-weight:500;">Instrument Serif</div>
+            <div style="font-size:12px; color:#6E6B64; margin-top:4px;">Headlines · pull quotes · numerals</div>
+          </div>
+          <div style="font-family:'Instrument Serif',serif; font-size:52px; line-height:1; color:#ECEAE3;">Engineering <span style="font-style:italic; color:var(--accent);">elegant</span> systems</div>
+        </div>
+        <!-- grotesk -->
+        <div style="background:#0C0C0E; padding:40px 34px; display:grid; grid-template-columns:200px 1fr; gap:30px; align-items:center;">
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.14em; color:var(--accent); margin-bottom:10px;">INTERFACE / BODY</div>
+            <div style="font-size:14px; color:#ECEAE3; font-weight:500;">Space Grotesk</div>
+            <div style="font-size:12px; color:#6E6B64; margin-top:4px;">UI · paragraphs · buttons</div>
+          </div>
+          <div>
+            <div style="font-size:24px; color:#ECEAE3; font-weight:500; margin-bottom:6px;">The quick brown fox builds production systems</div>
+            <div style="font-size:15px; color:#A7A39B; line-height:1.6;">From responsive front-ends to resilient APIs — type that stays legible at every scale, in light interface and long-form reading alike.</div>
+          </div>
+        </div>
+        <!-- mono -->
+        <div style="background:#0C0C0E; padding:40px 34px; display:grid; grid-template-columns:200px 1fr; gap:30px; align-items:center;">
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.14em; color:var(--accent); margin-bottom:10px;">SIGNAL / CODE</div>
+            <div style="font-size:14px; color:#ECEAE3; font-weight:500;">JetBrains Mono</div>
+            <div style="font-size:12px; color:#6E6B64; margin-top:4px;">Labels · metadata · code</div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:14px; color:#A7A39B; line-height:1.7;"><span style="color:var(--accent);">const</span> stack = [<span style="color:#ECEAE3;">'Laravel'</span>, <span style="color:#ECEAE3;">'Vue'</span>, <span style="color:#ECEAE3;">'Node'</span>];<br><span style="color:#6E6B64;">// 01 — FRONTEND · BACKEND · CLOUD</span></div>
+        </div>
+      </div>
+
+      <!-- type scale -->
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.18em; color:#6E6B64; margin:48px 0 22px;">TYPE SCALE — 1.25 RATIO</div>
+      <div style="display:flex; flex-direction:column; gap:18px;">
+        <sc-for list="{{ typeScale }}" as="t" hint-placeholder-count="6">
+          <div style="display:flex; align-items:baseline; gap:24px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:18px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6E6B64; width:90px; flex-shrink:0;">{{ t.token }}</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6E6B64; width:54px; flex-shrink:0;">{{ t.px }}</span>
+            <span style="font-size:{{ t.px }}; line-height:1.1; color:#ECEAE3; font-family:{{ t.family }}; white-space:nowrap; overflow:hidden; text-overflow:clip;">{{ t.sample }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- ===== 04 SPACING & RADII ===== -->
+    <section style="padding:96px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex; align-items:baseline; gap:18px; margin-bottom:18px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent); letter-spacing:0.1em;">04</span>
+        <h2 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:38px; margin:0; color:#ECEAE3;">Spacing &amp; Form</h2>
+      </div>
+      <p style="max-width:520px; margin:0 0 48px; font-size:15px; line-height:1.65; color:#A7A39B;">An 8-point rhythm governs every gap and inset. Corners stay tight — 2 to 4px — so surfaces feel architectural, not soft.</p>
+      <div style="display:grid; grid-template-columns:1.3fr 1fr; gap:48px; align-items:start;">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.18em; color:#6E6B64; margin-bottom:20px;">8PT SCALE</div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <sc-for list="{{ spacing }}" as="sp" hint-placeholder-count="6">
+              <div style="display:flex; align-items:center; gap:18px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6E6B64; width:64px;">{{ sp.token }}</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#A7A39B; width:48px;">{{ sp.px }}</span>
+                <div style="height:14px; background:var(--accent); border-radius:2px; width:{{ sp.px }};"></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.18em; color:#6E6B64; margin-bottom:20px;">RADII &amp; LINE</div>
+          <div style="display:flex; gap:14px; margin-bottom:26px;">
+            <div style="text-align:center;">
+              <div style="width:84px; height:84px; background:#1C1C20; border:1px solid rgba(255,255,255,0.1); border-radius:2px;"></div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6E6B64; margin-top:10px;">2px · sm</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="width:84px; height:84px; background:#1C1C20; border:1px solid rgba(255,255,255,0.1); border-radius:4px;"></div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6E6B64; margin-top:10px;">4px · md</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="width:84px; height:84px; background:#1C1C20; border:1px solid rgba(255,255,255,0.1); border-radius:999px;"></div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6E6B64; margin-top:10px;">full · pill</div>
+            </div>
+          </div>
+          <div style="border:1px solid rgba(255,255,255,0.1); border-radius:4px; padding:20px;">
+            <div style="font-size:13px; color:#A7A39B; margin-bottom:12px;">Hairline dividers at <span style="color:var(--accent); font-family:'JetBrains Mono',monospace;">9%</span> white separate every region.</div>
+            <div style="height:1px; background:rgba(255,255,255,0.09);"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 05 COMPONENTS ===== -->
+    <section style="padding:96px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex; align-items:baseline; gap:18px; margin-bottom:18px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent); letter-spacing:0.1em;">05</span>
+        <h2 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:38px; margin:0; color:#ECEAE3;">Components</h2>
+      </div>
+      <p style="max-width:520px; margin:0 0 48px; font-size:15px; line-height:1.65; color:#A7A39B;">The reusable parts. Each is a single decision applied everywhere — so the portfolio reads as one continuous object, never a patchwork.</p>
+
+      <!-- buttons -->
+      <div style="border:1px solid rgba(255,255,255,0.08); border-radius:4px; padding:34px; margin-bottom:14px;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#6E6B64; margin-bottom:26px;">BUTTONS</div>
+        <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:center;">
+          <button ref="{{ btnRef }}" style="font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:600; color:#0C0C0E; background:var(--accent); border:none; border-radius:3px; padding:13px 26px; cursor:pointer; letter-spacing:0.01em;">Get in touch →</button>
+          <button style="font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:500; color:#ECEAE3; background:transparent; border:1px solid rgba(255,255,255,0.2); border-radius:3px; padding:13px 26px; cursor:pointer;">View résumé</button>
+          <button style="font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:500; color:var(--accent); background:transparent; border:none; padding:13px 4px; cursor:pointer; border-bottom:1px solid var(--accent); border-radius:0;">Learn more →</button>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#3E3C38;">primary · ghost · text</span>
+        </div>
+      </div>
+
+      <!-- tags + status -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+        <div style="border:1px solid rgba(255,255,255,0.08); border-radius:4px; padding:34px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#6E6B64; margin-bottom:26px;">TECH TAGS</div>
+          <div style="display:flex; flex-wrap:wrap; gap:10px;">
+            <sc-for list="{{ tags }}" as="tg" hint-placeholder-count="5">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#A7A39B; border:1px solid rgba(255,255,255,0.14); border-radius:999px; padding:7px 15px;">{{ tg }}</span>
+            </sc-for>
+          </div>
+        </div>
+        <div style="border:1px solid rgba(255,255,255,0.08); border-radius:4px; padding:34px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#6E6B64; margin-bottom:26px;">STATUS</div>
+          <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:center;">
+            <span style="display:inline-flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; font-size:12px; color:#79B791;"><span style="width:7px; height:7px; border-radius:50%; background:#79B791; box-shadow:0 0 0 3px rgba(121,183,145,0.18);"></span>Live</span>
+            <span style="display:inline-flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--accent);"><span style="width:7px; height:7px; border-radius:50%; background:var(--accent);"></span>Featured</span>
+            <span style="display:inline-flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; font-size:12px; color:#6E6B64;"><span style="width:7px; height:7px; border-radius:50%; background:#6E6B64;"></span>Archived</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- input -->
+      <div style="border:1px solid rgba(255,255,255,0.08); border-radius:4px; padding:34px; margin-bottom:14px;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#6E6B64; margin-bottom:26px;">FIELDS</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:28px; max-width:680px;">
+          <div>
+            <label style="display:block; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.1em; color:#6E6B64; margin-bottom:12px;">YOUR NAME</label>
+            <input placeholder="Jane Doe" style="width:100%; background:transparent; border:none; border-bottom:1px solid rgba(255,255,255,0.18); color:#ECEAE3; font-family:'Space Grotesk',sans-serif; font-size:16px; padding:8px 0; outline:none;" style-focus="border-bottom:1px solid var(--accent);">
+          </div>
+          <div>
+            <label style="display:block; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.1em; color:#6E6B64; margin-bottom:12px;">EMAIL</label>
+            <input placeholder="jane@studio.com" style="width:100%; background:transparent; border:none; border-bottom:1px solid rgba(255,255,255,0.18); color:#ECEAE3; font-family:'Space Grotesk',sans-serif; font-size:16px; padding:8px 0; outline:none;" style-focus="border-bottom:1px solid var(--accent);">
+          </div>
+        </div>
+      </div>
+
+      <!-- project card spec -->
+      <div style="border:1px solid rgba(255,255,255,0.08); border-radius:4px; padding:34px;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.16em; color:#6E6B64; margin-bottom:26px;">PROJECT CARD</div>
+        <div style="max-width:440px; border:1px solid rgba(255,255,255,0.1); border-radius:4px; overflow:hidden; background:#101012;">
+          <div style="position:relative; height:200px; overflow:hidden; background:#1C1C20;">
+            <img src="assets/tiket-lakwatsero.png" alt="Tiket Lakwatsero" style="width:100%; height:100%; object-fit:cover; filter:saturate(0.9) contrast(1.02);">
+            <div style="position:absolute; top:14px; left:14px; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent); background:rgba(12,12,14,0.7); backdrop-filter:blur(6px); padding:5px 11px; border-radius:999px;">● Featured</div>
+            <div style="position:absolute; bottom:14px; right:14px; font-family:'JetBrains Mono',monospace; font-size:11px; color:#ECEAE3;">01 / 06</div>
+          </div>
+          <div style="padding:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px;">
+              <h4 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:26px; margin:0; color:#ECEAE3;">Tiket Lakwatsero</h4>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6E6B64;">2024</span>
+            </div>
+            <p style="margin:0 0 18px; font-size:14px; line-height:1.6; color:#A7A39B;">A travel-booking platform with seat selection, payments, and an operator dashboard.</p>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#A7A39B; border:1px solid rgba(255,255,255,0.14); border-radius:999px; padding:5px 12px;">Laravel</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#A7A39B; border:1px solid rgba(255,255,255,0.14); border-radius:999px; padding:5px 12px;">Vue</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#A7A39B; border:1px solid rgba(255,255,255,0.14); border-radius:999px; padding:5px 12px;">MySQL</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 06 MOTION ===== -->
+    <section style="padding:96px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex; align-items:baseline; gap:18px; margin-bottom:18px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent); letter-spacing:0.1em;">06</span>
+        <h2 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:38px; margin:0; color:#ECEAE3;">Motion</h2>
+      </div>
+      <p style="max-width:520px; margin:0 0 48px; font-size:15px; line-height:1.65; color:#A7A39B;">Motion is quiet and physical. Things ease, never bounce. Durations are short for interface, longer for narrative transitions between sections.</p>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px;">
+        <sc-for list="{{ motion }}" as="m" hint-placeholder-count="3">
+          <div style="border:1px solid rgba(255,255,255,0.08); border-radius:4px; padding:28px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent); letter-spacing:0.1em; margin-bottom:16px;">{{ m.dur }}</div>
+            <div style="font-size:16px; color:#ECEAE3; font-weight:500; margin-bottom:8px;">{{ m.title }}</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#6E6B64; margin-bottom:14px;">{{ m.ease }}</div>
+            <div style="font-size:13px; color:#A7A39B; line-height:1.55;">{{ m.use }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- ===== 07 VOICE ===== -->
+    <section style="padding:96px 0 0;">
+      <div style="display:flex; align-items:baseline; gap:18px; margin-bottom:18px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent); letter-spacing:0.1em;">07</span>
+        <h2 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:38px; margin:0; color:#ECEAE3;">Voice &amp; Tone</h2>
+      </div>
+      <p style="max-width:520px; margin:0 0 48px; font-size:15px; line-height:1.65; color:#A7A39B;">Write like a senior who has nothing to prove: plain, specific, and calm. State what was built and the outcome. Let the work carry the weight — never the adjectives.</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div style="border:1px solid rgba(121,183,145,0.3); border-radius:4px; padding:30px; background:rgba(121,183,145,0.04);">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#79B791; letter-spacing:0.1em; margin-bottom:20px;">DO</div>
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <sc-for list="{{ voiceDo }}" as="d" hint-placeholder-count="3">
+              <div style="font-size:15px; color:#ECEAE3; line-height:1.5;">{{ d }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="border:1px solid rgba(255,255,255,0.1); border-radius:4px; padding:30px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#6E6B64; letter-spacing:0.1em; margin-bottom:20px;">DON'T</div>
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <sc-for list="{{ voiceDont }}" as="d" hint-placeholder-count="3">
+              <div style="font-size:15px; color:#6E6B64; line-height:1.5; text-decoration:line-through; text-decoration-color:rgba(255,255,255,0.2);">{{ d }}</div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 08 PATTERNS ===== -->
+    <section style="padding:96px 0 0; border-top:1px solid rgba(255,255,255,0.08);">
+      <div style="display:flex; align-items:baseline; gap:18px; margin-bottom:18px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent); letter-spacing:0.1em;">08</span>
+        <h2 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:38px; margin:0; color:#ECEAE3;">Application Patterns</h2>
+      </div>
+      <p style="max-width:520px; margin:0 0 48px; font-size:15px; line-height:1.65; color:#A7A39B;">The composed components assembled from the tokens above — the recurring blocks that make the portfolio read as one object. Each is documented in full in the handoff README.</p>
+      <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.08);">
+        <sc-for list="{{ patterns }}" as="p" hint-placeholder-count="6">
+          <div style="background:#0C0C0E; padding:34px 30px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6E6B64; letter-spacing:0.16em; margin-bottom:18px;">{{ p.tag }}</div>
+            <h3 style="font-family:'Instrument Serif',serif; font-weight:400; font-size:23px; margin:0 0 12px; color:#ECEAE3;">{{ p.title }}</h3>
+            <p style="margin:0; font-size:14px; line-height:1.6; color:#A7A39B;">{{ p.body }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+  </main>
+
+  <footer style="border-top:1px solid rgba(255,255,255,0.1);">
+    <div style="max-width:1180px; margin:0 auto; padding:40px 48px; display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6E6B64; letter-spacing:0.1em;">ATELIER — DEREM JOSHUA RIVERA · DJ</span>
+      <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6E6B64; letter-spacing:0.1em;">v1.0 / 2026</span>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:900},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#E0A53D&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showGrid&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  rootRef = (el) => { this.root = el; };
+  btnRef = (el) => { this.btn = el; };
+
+  applyAccent() {
+    if (this.root) this.root.style.setProperty('--accent', this.props.accent || '#E0A53D');
+  }
+  componentDidMount() {
+    this.applyAccent();
+    if (this.btn) {
+      this.btn.addEventListener('mouseenter', () => { this.btn.style.transform = 'translateY(-2px)'; this.btn.style.transition = 'transform .25s cubic-bezier(.2,.7,.3,1), box-shadow .25s'; this.btn.style.boxShadow = '0 10px 30px rgba(224,165,61,0.25)'; });
+      this.btn.addEventListener('mouseleave', () => { this.btn.style.transform = 'translateY(0)'; this.btn.style.boxShadow = 'none'; });
+    }
+  }
+  componentDidUpdate() { this.applyAccent(); }
+
+  renderVals() {
+    return {
+      rootRef: this.rootRef,
+      btnRef: this.btnRef,
+      showGrid: this.props.showGrid ?? false,
+      indexItems: [
+        { no: '01', label: 'Principles' },
+        { no: '02', label: 'Color' },
+        { no: '03', label: 'Typography' },
+        { no: '04', label: 'Spacing & Form' },
+        { no: '05', label: 'Components' },
+        { no: '06', label: 'Motion' },
+        { no: '07', label: 'Voice & Tone' },
+        { no: '08', label: 'Application' },
+      ],
+      principles: [
+        { tag: 'P.01', title: 'Restraint', body: 'One accent, one foundation, generous space. The portfolio earns trust by holding back — confidence reads as calm, not noise.' },
+        { tag: 'P.02', title: 'Evidence over adjectives', body: 'Show the build, the stack, the outcome. The work proves seniority; the layout just gets out of its way.' },
+        { tag: 'P.03', title: 'Systemized', body: 'Every surface is assembled from the same tokens and parts. Consistency is the craft signal a recruiter feels before they read a word.' },
+        { tag: 'P.04', title: 'Intentional motion', body: 'Movement clarifies hierarchy and guides the eye between scenes. It is felt, rarely noticed — never decorative.' },
+      ],
+      inkSwatches: [
+        { name: 'Ink', hex: '#0C0C0E', role: 'Page base', bg: '#0C0C0E' },
+        { name: 'Surface', hex: '#141416', role: 'Cards', bg: '#141416' },
+        { name: 'Raised', hex: '#1C1C20', role: 'Wells / hover', bg: '#1C1C20' },
+        { name: 'Line', hex: 'rgba(255,255,255,.09)', role: 'Dividers', bg: '#26262A' },
+      ],
+      typeScale: [
+        { token: 'display', px: '60px', family: "'Instrument Serif',serif", sample: 'Selected work' },
+        { token: 'h1', px: '38px', family: "'Instrument Serif',serif", sample: 'Tiket Lakwatsero' },
+        { token: 'h2', px: '28px', family: "'Space Grotesk',sans-serif", sample: 'Tiket Lakwatsero' },
+        { token: 'body-lg', px: '18px', family: "'Space Grotesk',sans-serif", sample: 'Building for users and business goals.' },
+        { token: 'body', px: '15px', family: "'Space Grotesk',sans-serif", sample: 'Responsive, user-centered applications.' },
+        { token: 'mono', px: '13px', family: "'JetBrains Mono',monospace", sample: 'FRONTEND · BACKEND · CLOUD' },
+      ],
+      spacing: [
+        { token: 'space-1', px: '8px' },
+        { token: 'space-2', px: '16px' },
+        { token: 'space-3', px: '24px' },
+        { token: 'space-4', px: '40px' },
+        { token: 'space-5', px: '64px' },
+        { token: 'space-6', px: '96px' },
+      ],
+      tags: ['Laravel', 'Vue', 'React', 'Next.js', 'Node', 'MongoDB', 'MySQL', 'AWS', 'Tailwind'],
+      motion: [
+        { dur: '180ms', title: 'Micro', ease: 'ease-out', use: 'Hover, focus, button lift, tag reveals.' },
+        { dur: '450ms', title: 'Reveal', ease: 'cubic-bezier(.2,.7,.3,1)', use: 'Cards entering, image scale, scroll-driven fades.' },
+        { dur: '800ms', title: 'Scene', ease: 'cubic-bezier(.65,0,.35,1)', use: 'Horizontal track moves, case-study expansion, chapter cuts.' },
+      ],
+      patterns: [
+        { tag: 'BROWSE / 01', title: 'Cinematic track', body: 'Horizontal, snap-scrolling reel of numbered project "scenes" with a progress bar, counter, drag + arrow-key nav. The signature way to browse work.' },
+        { tag: 'BROWSE / 02', title: 'Index grid', body: 'A calm 3-up fallback view of the same projects, toggled from the track — for visitors who prefer to scan over scroll.' },
+        { tag: 'OVERLAY', title: 'Case-study drawer', body: 'Right-side drawer that slides in over a blurred backdrop: hero image, highlights, problem/solution/role/stack, with in-overlay prev/next project nav.' },
+        { tag: 'NARRATIVE', title: 'Process pipeline', body: 'Five connected stage cards with a flowing gold connector, a step/progress header, and a live build console that fills as stages advance.' },
+        { tag: 'DOCUMENT', title: 'Résumé sheet', body: 'A letter-proportioned paper sheet (816×1056) inset into the dark site — palette inverted to warm paper, with stacked-sheet edges, an experience timeline, and a downloadable PDF.' },
+        { tag: 'FORM', title: 'Contact + channels', body: 'Icon contact cards, an availability pill, brand social buttons, and a refined two-column form card with a sent-state and reply-time note.' },
+      ],
+      voiceDo: [
+        '“Built a booking platform handling seat selection and payments.”',
+        '“Laravel API, Vue front-end, deployed on AWS.”',
+        '“Reduced checkout steps from five to two.”',
+      ],
+      voiceDont: [
+        '“Passionate ninja rockstar developer!!!”',
+        '“Cutting-edge, world-class, next-level solutions.”',
+        '“I make beautiful AND functional websites.”',
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

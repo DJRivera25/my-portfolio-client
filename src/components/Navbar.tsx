@@ -112,6 +112,9 @@ const Navbar: React.FC = () => {
     };
   }, [isOpen]);
 
+  // The home route renders its own Atelier site nav.
+  if (isHome) return null;
+
   return (
     <motion.nav
       initial={{ y: -40, opacity: 0 }}

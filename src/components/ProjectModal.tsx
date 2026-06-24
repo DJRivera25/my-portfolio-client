@@ -20,6 +20,12 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
   const [link, setLink] = useState("");
   const [year, setYear] = useState<string>("");
   const [role, setRole] = useState("");
+  const [tagline, setTagline] = useState("");
+  const [kind, setKind] = useState("");
+  const [problem, setProblem] = useState("");
+  const [solution, setSolution] = useState("");
+  const [highlights, setHighlights] = useState<string[]>([]);
+  const [highlightDraft, setHighlightDraft] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [tagDraft, setTagDraft] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -37,6 +43,12 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
       setLink(initialData.link);
       setYear(initialData.year ? String(initialData.year) : "");
       setRole(initialData.role ?? "");
+      setTagline(initialData.tagline ?? "");
+      setKind(initialData.kind ?? "");
+      setProblem(initialData.problem ?? "");
+      setSolution(initialData.solution ?? "");
+      setHighlights(initialData.highlights ?? []);
+      setHighlightDraft("");
       setTags(initialData.tags ?? []);
       setPreview(initialData.image);
       setMobilePreview(initialData.mobileImage ?? null);
@@ -49,6 +61,12 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
       setLink("");
       setYear("");
       setRole("");
+      setTagline("");
+      setKind("");
+      setProblem("");
+      setSolution("");
+      setHighlights([]);
+      setHighlightDraft("");
       setTags([]);
       setTagDraft("");
       setImageFile(null);
@@ -102,6 +120,34 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
     setTags(tags.filter((t) => t !== tag));
   };
 
+  const commitHighlightDraft = () => {
+    const value = highlightDraft.trim();
+    if (!value) return;
+    if (highlights.includes(value)) {
+      setHighlightDraft("");
+      return;
+    }
+    if (highlights.length >= 6) {
+      toast.info("Up to 6 highlights per project.");
+      return;
+    }
+    setHighlights([...highlights, value]);
+    setHighlightDraft("");
+  };
+
+  const handleHighlightKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      commitHighlightDraft();
+    } else if (e.key === "Backspace" && !highlightDraft && highlights.length > 0) {
+      setHighlights(highlights.slice(0, -1));
+    }
+  };
+
+  const removeHighlight = (value: string) => {
+    setHighlights(highlights.filter((h) => h !== value));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -111,9 +157,14 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
       formData.append("description", description);
       formData.append("link", link);
       formData.append("tags", JSON.stringify(tags));
+      formData.append("highlights", JSON.stringify(highlights));
       if (year) formData.append("year", year);
       else if (initialData) formData.append("year", "");
       formData.append("role", role);
+      formData.append("tagline", tagline);
+      formData.append("kind", kind);
+      formData.append("problem", problem);
+      formData.append("solution", solution);
       if (imageFile) {
         formData.append("image", imageFile);
       }
@@ -192,6 +243,72 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
             value={role}
             onChange={(e) => setRole(e.target.value)}
           />
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <input
+            type="text"
+            placeholder="Kind / category label (e.g. E-COMMERCE)"
+            className={inputClass}
+            value={kind}
+            onChange={(e) => setKind(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Tagline (one line, optional)"
+            className={inputClass}
+            value={tagline}
+            onChange={(e) => setTagline(e.target.value)}
+          />
+        </div>
+
+        <textarea
+          placeholder="The problem (case study, optional)"
+          rows={3}
+          className={`${inputClass} resize-none`}
+          value={problem}
+          onChange={(e) => setProblem(e.target.value)}
+        />
+
+        <textarea
+          placeholder="What I built (case study, optional)"
+          rows={3}
+          className={`${inputClass} resize-none`}
+          value={solution}
+          onChange={(e) => setSolution(e.target.value)}
+        />
+
+        <div>
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-white/60">
+            Highlights (case-study check cards)
+          </p>
+          <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-hairline-strong bg-brand-navy/40 px-3 py-2 focus-within:border-accent-cyan focus-within:ring-1 focus-within:ring-accent-cyan">
+            {highlights.map((highlight) => (
+              <span
+                key={highlight}
+                className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent-muted px-2.5 py-0.5 text-xs font-medium text-accent"
+              >
+                {highlight}
+                <button
+                  type="button"
+                  onClick={() => removeHighlight(highlight)}
+                  className="text-accent/70 transition hover:text-accent"
+                  aria-label={`Remove ${highlight}`}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            ))}
+            <input
+              type="text"
+              placeholder={highlights.length === 0 ? "Highlights (Enter to add)" : "Add highlight…"}
+              className="flex-1 min-w-[120px] bg-transparent text-sm text-white placeholder:text-white/40 focus:outline-none"
+              value={highlightDraft}
+              onChange={(e) => setHighlightDraft(e.target.value)}
+              onKeyDown={handleHighlightKey}
+              onBlur={commitHighlightDraft}
+            />
+          </div>
         </div>
 
         <div>

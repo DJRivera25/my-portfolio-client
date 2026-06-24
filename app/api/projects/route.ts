@@ -39,9 +39,14 @@ export async function POST(req: Request) {
 
   const tagsRaw = formData.get("tags");
   const tags = parseTags(tagsRaw);
+  const highlights = parseTags(formData.get("highlights"));
   const yearRaw = formData.get("year");
   const year = yearRaw ? Number(yearRaw) : undefined;
   const role = formData.get("role");
+  const optionalString = (key: string): string | undefined => {
+    const value = formData.get(key);
+    return value ? String(value) : undefined;
+  };
 
   const project = await Project.create({
     title: String(title),
@@ -52,6 +57,11 @@ export async function POST(req: Request) {
     tags,
     year: Number.isFinite(year) ? year : undefined,
     role: role ? String(role) : undefined,
+    tagline: optionalString("tagline"),
+    kind: optionalString("kind"),
+    problem: optionalString("problem"),
+    solution: optionalString("solution"),
+    highlights,
   });
   return NextResponse.json(project, { status: 201 });
 }

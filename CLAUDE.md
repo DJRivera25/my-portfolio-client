@@ -191,6 +191,17 @@ Lightweight feature → file map. When you add a new feature folder, add it here
         "src/config/navigation.ts"
       ]
     },
+    "atelier-redesign": {
+      "purpose": "\"The Build Log\" single-page home redesign (Atelier design system). app/page.tsx renders PortfolioPage, which owns shared state + data fetching and composes all sections. Global Navbar/Footer return null on '/'. Static copy + graceful fallbacks live in src/config/atelier.ts; DB-backed sections reuse the projects/tools/socials/resumes APIs and Project case-study fields (tagline, kind, problem, solution, highlights).",
+      "paths": [
+        "src/components/portfolio/**",
+        "src/config/atelier.ts",
+        "src/hooks/useCursorGlow.ts",
+        "src/hooks/useMagnetic.ts",
+        "src/hooks/useTypewriter.ts",
+        "public/atelier/**"
+      ]
+    },
     "infrastructure": {
       "purpose": "DB connection, site constants, env, build config",
       "paths": [
