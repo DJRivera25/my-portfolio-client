@@ -202,6 +202,26 @@ Lightweight feature → file map. When you add a new feature folder, add it here
         "public/atelier/**"
       ]
     },
+    "worklog": {
+      "purpose": "Work tracking written by Claude Code over MCP: entries/tasks by project, session status, reports. Service layer in lib/worklog (pure core + query shells); /api/mcp is the Claude Code adapter, /api/worklog the dashboard adapter. Private dashboard at /worklog; opt-in public Build Log feed on the homepage. Projects are matched by separator-free matchKey, so 'Tools Australia' and 'toolsaustralia' are one project.",
+      "paths": [
+        "lib/models/WorkProject.ts",
+        "lib/models/WorkEntry.ts",
+        "lib/models/WorkSession.ts",
+        "lib/models/Counter.ts",
+        "lib/worklog/**",
+        "app/api/mcp/**",
+        "app/api/worklog/**",
+        "app/worklog/**",
+        "src/components/worklog/**",
+        "src/components/portfolio/BuildLogSection.tsx",
+        "src/config/worklog.ts",
+        "src/lib/api/worklog.ts",
+        "src/types/worklog.ts",
+        "scripts/worklog-reset.mjs",
+        "docs/worklog.md"
+      ]
+    },
     "infrastructure": {
       "purpose": "DB connection, site constants, env, build config",
       "paths": [
