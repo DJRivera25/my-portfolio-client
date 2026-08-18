@@ -4,12 +4,12 @@
   "private": true,
   "dependencies": {
     "@headlessui/react": "^2.2.4",
+    "@modelcontextprotocol/server": "^2.0.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.126",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "axios": "^1.10.0",
@@ -21,6 +21,7 @@
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
     "lucide-react": "^0.525.0",
+    "mcp-handler": "^2.1.1",
     "mongoose": "^8.16.3",
     "next": "15.4.10",
     "nodemailer": "^7.0.5",
@@ -28,12 +29,16 @@
     "react-dom": "^19.1.0",
     "react-scroll": "^1.9.3",
     "react-toastify": "^11.0.5",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "zod": "^4.4.3"
   },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit"
   },
   "eslintConfig": {
     "extends": [
@@ -56,11 +61,13 @@
   "devDependencies": {
     "@types/formidable": "^3.4.5",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^22.20.1",
     "@types/nodemailer": "^6.4.17",
     "@types/react-scroll": "^1.8.10",
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.24",
     "tailwindcss": "^3.3.3",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
   }
 }

@@ -41,6 +41,16 @@ function latestUserMessage(transcriptPath) {
     try { entry = JSON.parse(lines[i]); } catch { continue; }
     if (entry?.role === "user" || entry?.type === "user") {
       const msg = entry.message?.content ?? entry.content ?? "";
+
+      // Tool results are also recorded as type:"user". Without skipping them the
+      // "latest user message" becomes the output of the command that just ran, so a
+      // single authorization only ever covers one git write and everything after it
+      // is blocked. Skip them so this reads the latest message a human actually sent.
+      const isToolResult =
+        entry.toolUseResult !== undefined ||
+        (Array.isArray(msg) && msg.some((p) => p?.type === "tool_result"));
+      if (isToolResult) continue;
+
       if (typeof msg === "string") return msg;
       if (Array.isArray(msg)) {
         return msg.map((p) => (typeof p === "string" ? p : p.text ?? "")).join(" ");

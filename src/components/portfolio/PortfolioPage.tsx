@@ -3,7 +3,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import api from "../../lib/api/client";
 import type { Project, Social } from "../../types/portfolio";
-import { defaultSocials, fallbackCaseStudies, stackGroups, toCaseStudy } from "../../config/atelier";
+import {
+  defaultSocials,
+  fallbackCaseStudies,
+  sortProjectsForDisplay,
+  stackGroups,
+  toCaseStudy,
+} from "../../config/atelier";
 import { useAuth } from "../../context/AuthContext";
 import { useCursorGlow } from "../../hooks/useCursorGlow";
 import ProjectModal from "../ProjectModal";
@@ -21,6 +27,9 @@ import SiteFooter from "./SiteFooter";
 import MobileBottomNav from "./MobileBottomNav";
 import CaseStudyDrawer from "./CaseStudyDrawer";
 import CommandPalette from "./CommandPalette";
+import BuildLogSection from "./BuildLogSection";
+import { fetchPublicEntries } from "../../lib/api/worklog";
+import type { PublicEntry } from "../../types/worklog";
 
 type SocialLink = { platform: string; url: string; icon?: string };
 
@@ -44,6 +53,7 @@ const PortfolioPage: React.FC = () => {
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [socials, setSocials] = useState<SocialLink[]>(defaultSocials);
+  const [buildLog, setBuildLog] = useState<PublicEntry[]>([]);
   // Stack section is a curated set of the four stacks I build with.
   const groups = stackGroups;
 
@@ -54,9 +64,13 @@ const PortfolioPage: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Project | null>(null);
 
+  // Display order is curated, not API order — admin edit/delete index into this same
+  // array as `cases`, so both must come from the ordered list to stay aligned.
+  const orderedProjects = useMemo(() => sortProjectsForDisplay(projects), [projects]);
+
   const cases = useMemo(
-    () => (projects.length ? projects.map(toCaseStudy) : fallbackCaseStudies),
-    [projects]
+    () => (orderedProjects.length ? orderedProjects.map(toCaseStudy) : fallbackCaseStudies),
+    [orderedProjects]
   );
 
   const reloadProjects = useCallback(() => {
@@ -86,6 +100,12 @@ const PortfolioPage: React.FC = () => {
       })
       .catch(() => {});
 
+    fetchPublicEntries()
+      .then((data) => {
+        if (alive && Array.isArray(data)) setBuildLog(data);
+      })
+      .catch(() => {});
+
     return () => {
       alive = false;
     };
@@ -98,14 +118,14 @@ const PortfolioPage: React.FC = () => {
   }, []);
   const onEditProject = useCallback(
     (index: number) => {
-      setEditing(projects[index] ?? null);
+      setEditing(orderedProjects[index] ?? null);
       setModalOpen(true);
     },
-    [projects]
+    [orderedProjects]
   );
   const onDeleteProject = useCallback(
     async (index: number) => {
-      const target = projects[index];
+      const target = orderedProjects[index];
       if (!target) return;
       if (!window.confirm(`Delete "${target.title}"? This cannot be undone.`)) return;
       try {
@@ -115,7 +135,7 @@ const PortfolioPage: React.FC = () => {
         console.error("Failed to delete project:", err);
       }
     },
-    [projects, reloadProjects]
+    [orderedProjects, reloadProjects]
   );
 
   // ---- shared handlers ----
@@ -218,6 +238,7 @@ const PortfolioPage: React.FC = () => {
         <AboutSection />
         <StackSection groups={groups} />
         <HowIShip />
+        <BuildLogSection entries={buildLog} />
         <ResumeSection />
         <ContactSection socials={socials} />
         <SiteFooter />
