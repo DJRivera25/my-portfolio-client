@@ -398,6 +398,38 @@ export const footerContent = {
 } as const;
 
 /* ------------------------------------------------ PROJECT → CASE STUDY */
+
+/**
+ * Curated running order for "The Build Log" — strongest, most recent client work first.
+ * Matched on title (trimmed, case-insensitive); projects not listed here keep their API
+ * order and sort last, so a newly added project still shows up without a code change.
+ */
+export const PROJECT_DISPLAY_ORDER: readonly string[] = [
+  "Tools Australia",
+  "Maximum88",
+  "Wedding Website",
+  "Weave Collaboration Partners",
+  "Pokemon Explorer",
+  "E-commerce Full-Stack Website (Capstone Project – Zuitt Coding Bootcamp)",
+  "ECommerce (Next.js) - In Progress",
+  "Tiket Lakwatsero",
+];
+
+const orderKey = (title: string) => title.trim().toLowerCase();
+const ORDER_INDEX = new Map(PROJECT_DISPLAY_ORDER.map((title, i) => [orderKey(title), i]));
+
+export function sortProjectsForDisplay(projects: Project[]): Project[] {
+  return [...projects]
+    .map((project, i) => ({ project, i, rank: ORDER_INDEX.get(orderKey(project.title)) }))
+    .sort((a, b) => {
+      if (a.rank === undefined && b.rank === undefined) return a.i - b.i;
+      if (a.rank === undefined) return 1;
+      if (b.rank === undefined) return -1;
+      return a.rank - b.rank;
+    })
+    .map((row) => row.project);
+}
+
 const truncate = (value: string, max = 120) =>
   value.length > max ? `${value.slice(0, max - 1).trimEnd()}…` : value;
 

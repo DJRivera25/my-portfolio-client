@@ -18,6 +18,7 @@ const ResumeSection: React.FC = () => {
     if (busy) return;
     setBusy(true);
     let clone: HTMLElement | null = null;
+    let metricsFix: HTMLStyleElement | null = null;
     try {
       const [{ jsPDF }, { default: html2canvas }] = await Promise.all([
         import("jspdf"),
@@ -25,6 +26,16 @@ const ResumeSection: React.FC = () => {
       ]);
       const src = document.getElementById("resume-print");
       if (!src) return;
+
+      // html2canvas finds the text baseline by putting a 1x1 probe <img vertical-align:baseline>
+      // next to a sample span and reading img.offsetTop - span.offsetTop. Tailwind Preflight's
+      // `img { display: block }` drops that probe onto its own line, so the baseline measures as
+      // ~line-height instead of the font ascent and every glyph paints ~8pt low — which slices the
+      // last line off every block. Keep the probe inline for the duration of the capture.
+      metricsFix = document.createElement("style");
+      metricsFix.textContent =
+        'img[width="1"][height="1"][style*="vertical-align: baseline"]{display:inline!important}';
+      document.head.appendChild(metricsFix);
 
       clone = src.cloneNode(true) as HTMLElement;
       clone.classList.add("resume-pdf-mode");
@@ -93,6 +104,7 @@ const ResumeSection: React.FC = () => {
       window.print();
     } finally {
       if (clone && clone.parentNode) clone.parentNode.removeChild(clone);
+      if (metricsFix && metricsFix.parentNode) metricsFix.parentNode.removeChild(metricsFix);
       setBusy(false);
     }
   };
