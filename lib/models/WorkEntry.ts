@@ -12,6 +12,8 @@ const WorkEntrySchema = new Schema(
     tags: { type: [String], default: [] },
     minutesSpent: { type: Number },
     branch: { type: String },
+    commitSha: { type: String, trim: true },
+    commitMessage: { type: String },
     prUrl: { type: String },
     session: { type: Schema.Types.ObjectId, ref: "WorkSession" },
     source: { type: String, default: "claude" },

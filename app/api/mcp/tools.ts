@@ -8,10 +8,12 @@ import {
 } from "@/lib/worklog/entries";
 import { listWorkProjects, setWorkProjectStatus } from "@/lib/worklog/projects";
 import { endSession, getSessionStatus } from "@/lib/worklog/sessions";
+import { attachLink, listAttachments } from "@/lib/worklog/attachmentQueries";
 import { formatEntries, formatReport } from "@/lib/worklog/format";
 import { parseSince } from "@/lib/worklog/since";
 import {
   WORK_ENTRY_STATUSES,
+  WORK_ATTACHMENT_KINDS,
   WORK_PROJECT_STATUSES,
   type WorkEntryLike,
 } from "@/lib/worklog/types";
@@ -58,6 +60,14 @@ export function registerWorklogTools(server: McpServer) {
         tags: z.array(z.string()).optional(),
         minutes_spent: z.number().int().positive().optional(),
         branch: z.string().optional(),
+        commit_sha: z
+          .string()
+          .optional()
+          .describe("The commit this shipped in. Lets a later session run `git show <sha>`."),
+        commit_message: z
+          .string()
+          .optional()
+          .describe("The commit subject line, so the log is readable without the repo."),
         pr_url: z.string().optional(),
         blocked_reason: z.string().optional().describe("Give this whenever status is 'blocked'."),
         session_id: z
@@ -75,6 +85,8 @@ export function registerWorklogTools(server: McpServer) {
         tags: input.tags,
         minutesSpent: input.minutes_spent,
         branch: input.branch,
+        commitSha: input.commit_sha,
+        commitMessage: input.commit_message,
         prUrl: input.pr_url,
         blockedReason: input.blocked_reason,
         sessionId: input.session_id,
@@ -250,6 +262,116 @@ export function registerWorklogTools(server: McpServer) {
       const session = await endSession(input.session_id, input.summary);
       if (!session) return text(`No session ${input.session_id}.`);
       return text(`Session ${session.sessionId} ended — ${session.entryCount} entries logged.`);
+    }
+  );
+
+  server.registerTool(
+    "attach_link",
+    {
+      title: "Attach link",
+      description:
+        "Attach a URL to a project or to a specific entry — a published Claude artifact, " +
+        "a PR, a deploy preview, a spec, a repo. Call this immediately after publishing " +
+        "an artifact so the work and the thing it produced stay connected; an artifact " +
+        "URL is otherwise lost when the session ends. The kind is inferred from the URL, " +
+        "so you rarely need to pass it.",
+      inputSchema: z.object({
+        project: z.string().describe("Project key, e.g. 'toolsaustralia'."),
+        url: z.string().describe("The full https URL."),
+        label: z.string().optional().describe("What it is. Inferred from the URL if omitted."),
+        kind: z.enum(WORK_ATTACHMENT_KINDS).optional().describe("Inferred if omitted."),
+        entry_ref: z
+          .number()
+          .int()
+          .optional()
+          .describe("Attach to this entry, e.g. 42 for '#42'. Omit to attach to the project."),
+      }),
+    },
+    async (input) => {
+      try {
+        const a = await attachLink({
+          project: input.project,
+          url: input.url,
+          label: input.label,
+          kind: input.kind,
+          entryRef: input.entry_ref,
+        });
+        const where = a.entryRef ? ` to #${a.entryRef}` : "";
+        return text(`Attached ${a.kind} #${a.ref}${where} — ${a.label}
+${a.url}`);
+      } catch (err) {
+        return text(`Could not attach: ${(err as Error).message}`);
+      }
+    }
+  );
+
+  server.registerTool(
+    "attach_link",
+    {
+      title: "Attach link",
+      description:
+        "Attach a URL to a project or to a specific entry — a published Claude artifact, " +
+        "a PR, a deploy preview, a spec, a repo. Call this immediately after publishing " +
+        "an artifact, so the work and the thing it produced stay connected; an artifact " +
+        "URL is otherwise lost when the session ends. The kind is inferred from the URL, " +
+        "so you rarely need to pass it.",
+      inputSchema: z.object({
+        project: z.string().describe("Project key, e.g. 'toolsaustralia'."),
+        url: z.string().describe("The full https URL."),
+        label: z.string().optional().describe("What it is. Inferred from the URL if omitted."),
+        kind: z.enum(WORK_ATTACHMENT_KINDS).optional().describe("Inferred if omitted."),
+        entry_ref: z
+          .number()
+          .int()
+          .optional()
+          .describe("Attach to this entry, e.g. 42 for '#42'. Omit to attach to the project."),
+      }),
+    },
+    async (input) => {
+      try {
+        const a = await attachLink({
+          project: input.project,
+          url: input.url,
+          label: input.label,
+          kind: input.kind,
+          entryRef: input.entry_ref,
+        });
+        const where = a.entryRef ? ` to #${a.entryRef}` : "";
+        return text(`Attached ${a.kind} #${a.ref}${where} — ${a.label}\n${a.url}`);
+      } catch (err) {
+        return text(`Could not attach: ${(err as Error).message}`);
+      }
+    }
+  );
+
+  server.registerTool(
+    "list_attachments",
+    {
+      title: "List attachments",
+      description:
+        "List the links attached to a project or a specific entry — artifacts, PRs, " +
+        "deploy previews, commits. Use it when asked what evidence or output exists for " +
+        "a piece of work, or to find an artifact published in an earlier session so it " +
+        "can be reopened.",
+      inputSchema: z.object({
+        project: z.string().optional(),
+        entry_ref: z.number().int().optional(),
+        limit: z.number().int().min(1).max(200).optional(),
+      }),
+    },
+    async (input) => {
+      const rows = await listAttachments({
+        project: input.project,
+        entryRef: input.entry_ref,
+        limit: input.limit,
+      });
+      if (!rows.length) return text("No attachments.");
+      const lines = rows.map((r) => {
+        const head = `#${r.ref} ${r.kind.padEnd(9)} ${r.label}`;
+        const where = r.entryRef ? ` (entry #${r.entryRef})` : "";
+        return `${head}${where}\n     ${r.url}`;
+      });
+      return text(lines.join("\n"));
     }
   );
 }

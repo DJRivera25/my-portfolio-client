@@ -30,6 +30,8 @@ export type WorkEntryLike = {
   tags?: string[] | null;
   minutesSpent?: number | null;
   branch?: string | null;
+  commitSha?: string | null;
+  commitMessage?: string | null;
   prUrl?: string | null;
   source?: string | null;
   completedAt?: Date | string | null;
@@ -85,4 +87,28 @@ export type WorkSessionSummary = {
   endedAt: string | null;
   summary: string | null;
   entryCount: number;
+};
+
+export const WORK_ATTACHMENT_KINDS = [
+  "artifact",
+  "commit",
+  "pr",
+  "repo",
+  "deploy",
+  "doc",
+  "image",
+  "video",
+  "link",
+] as const;
+
+export type WorkAttachmentKind = (typeof WORK_ATTACHMENT_KINDS)[number];
+
+export type WorkAttachmentSummary = {
+  ref: number;
+  kind: WorkAttachmentKind;
+  label: string;
+  url: string;
+  entryRef: number | null;
+  project: { name: string; slug: string } | null;
+  createdAt: string;
 };

@@ -4,13 +4,26 @@ import React from "react";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { Check, ChevronDown } from "lucide-react";
 import { STATUS_META, STATUS_ORDER, worklogContent } from "../../config/worklog";
-import type { WorkEntry, WorkEntryStatus } from "../../types/worklog";
+import type { WorkAttachmentSummary, WorkEntry, WorkEntryStatus } from "../../types/worklog";
 
 interface Props {
   entries: WorkEntry[];
+  attachmentsByEntry: Map<number, WorkAttachmentSummary[]>;
   busyRef: number | null;
   onStatusChange: (ref: number, status: WorkEntryStatus) => void;
 }
+
+const KIND_ICON: Record<string, string> = {
+  artifact: "◆",
+  commit: "⌥",
+  pr: "⑂",
+  repo: "▣",
+  deploy: "▲",
+  doc: "▤",
+  image: "▨",
+  video: "▶",
+  link: "↗",
+};
 
 function relative(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
@@ -22,7 +35,7 @@ function relative(iso: string): string {
   return days < 30 ? `${days}d ago` : new Date(iso).toLocaleDateString();
 }
 
-const WorkEntryList: React.FC<Props> = ({ entries, busyRef, onStatusChange }) => {
+const WorkEntryList: React.FC<Props> = ({ entries, attachmentsByEntry, busyRef, onStatusChange }) => {
   if (!entries.length) {
     return (
       <div className="rounded-xl border border-white/[0.09] bg-white/[0.02] px-6 py-12 text-center">
@@ -39,6 +52,7 @@ const WorkEntryList: React.FC<Props> = ({ entries, busyRef, onStatusChange }) =>
       {entries.map((entry) => {
         const meta = STATUS_META[entry.status];
         const busy = busyRef === entry.ref;
+        const links = attachmentsByEntry.get(entry.ref) ?? [];
 
         return (
           <li
@@ -95,6 +109,38 @@ const WorkEntryList: React.FC<Props> = ({ entries, busyRef, onStatusChange }) =>
                       >
                         {tag}
                       </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* The trail back to the work: the commit it shipped in, and anything
+                    attached — a published artifact, a PR, a deploy preview. */}
+                {(entry.commitSha || entry.branch || links.length > 0) && (
+                  <div className="mt-2.5 flex flex-wrap items-center gap-x-3.5 gap-y-1.5">
+                    {entry.branch && (
+                      <span className="font-codet text-[11px] text-atelier-faint">
+                        ⑂ {entry.branch}
+                      </span>
+                    )}
+                    {entry.commitSha && (
+                      <span
+                        className="font-codet text-[11px] text-atelier-muted"
+                        title={entry.commitMessage ?? undefined}
+                      >
+                        ⌥ {entry.commitSha.slice(0, 7)}
+                      </span>
+                    )}
+                    {links.map((link) => (
+                      <a
+                        key={link.ref}
+                        href={link.url}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="inline-flex items-center gap-1.5 font-codet text-[11px] text-atelier-gold transition-colors hover:text-atelier-paper"
+                      >
+                        <span aria-hidden>{KIND_ICON[link.kind] ?? "↗"}</span>
+                        {link.label}
+                      </a>
                     ))}
                   </div>
                 )}

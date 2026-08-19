@@ -1,6 +1,8 @@
 import api from "./client";
 import type {
+  DashboardPayload,
   ReportDigest,
+  WorkAttachmentSummary,
   WorkEntry,
   WorkEntryStatus,
   WorkProjectSummary,
@@ -52,5 +54,24 @@ export async function updateEntryStatus(
   blockedReason?: string
 ): Promise<WorkEntry> {
   const res = await api.patch<WorkEntry>("/api/worklog/entries", { ref, status, blockedReason });
+  return res.data;
+}
+
+/**
+ * One request for the whole dashboard. Filtering and aggregation happen client-side
+ * from this payload, so interacting with filters costs no network.
+ */
+export async function fetchDashboard(): Promise<DashboardPayload> {
+  const res = await api.get<DashboardPayload>("/api/worklog/dashboard");
+  return res.data;
+}
+
+export async function attachLinkToWorklog(input: {
+  project: string;
+  url: string;
+  label?: string;
+  entryRef?: number;
+}): Promise<WorkAttachmentSummary> {
+  const res = await api.post<WorkAttachmentSummary>("/api/worklog/attachments", input);
   return res.data;
 }

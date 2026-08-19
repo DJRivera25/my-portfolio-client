@@ -11,6 +11,8 @@ export interface WorkEntry {
   tags?: string[];
   minutesSpent?: number | null;
   branch?: string | null;
+  commitSha?: string | null;
+  commitMessage?: string | null;
   prUrl?: string | null;
   source?: string;
   completedAt?: string | null;
@@ -55,4 +57,33 @@ export interface ReportDigest {
     minutesSpent: number;
   }>;
   blockers: Array<{ ref: number; title: string; project: string; reason: string | null }>;
+}
+
+export type WorkAttachmentKind =
+  | "artifact"
+  | "commit"
+  | "pr"
+  | "repo"
+  | "deploy"
+  | "doc"
+  | "image"
+  | "video"
+  | "link";
+
+export interface WorkAttachmentSummary {
+  ref: number;
+  kind: WorkAttachmentKind;
+  label: string;
+  url: string;
+  entryRef: number | null;
+  project: { name: string; slug: string } | null;
+  createdAt: string;
+}
+
+/** Everything the dashboard needs, in one response. */
+export interface DashboardPayload {
+  projects: WorkProjectSummary[];
+  entries: WorkEntry[];
+  sessions: WorkSessionSummary[];
+  attachments: WorkAttachmentSummary[];
 }

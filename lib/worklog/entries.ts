@@ -24,6 +24,8 @@ export type LogWorkInput = {
   tags?: string[];
   minutesSpent?: number;
   branch?: string;
+  commitSha?: string;
+  commitMessage?: string;
   prUrl?: string;
   blockedReason?: string;
   sessionId?: string;
@@ -47,6 +49,8 @@ function fieldsFrom(input: LogWorkInput, status: WorkEntryStatus): Record<string
   if (input.tags !== undefined) set.tags = input.tags;
   if (input.minutesSpent !== undefined) set.minutesSpent = input.minutesSpent;
   if (input.branch !== undefined) set.branch = input.branch;
+  if (input.commitSha !== undefined) set.commitSha = input.commitSha;
+  if (input.commitMessage !== undefined) set.commitMessage = input.commitMessage;
   if (input.prUrl !== undefined) set.prUrl = input.prUrl;
   if (input.blockedReason !== undefined) set.blockedReason = input.blockedReason;
   return set;
