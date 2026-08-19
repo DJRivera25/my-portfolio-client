@@ -100,8 +100,11 @@ const WorkEntryList: React.FC<Props> = ({ entries, attachmentsByEntry, busyRef, 
                 )}
 
                 {entry.status === "blocked" && entry.blockedReason && (
-                  <p className="m-0 mt-1.5 text-[13px]" style={{ color: "#E07A5F" }}>
-                    ↳ {entry.blockedReason}
+                  <p
+                    className="m-0 mt-2 border-l-2 pl-2.5 text-[13px] leading-relaxed"
+                    style={{ color: "#E07A5F", borderColor: "rgba(224,122,95,0.45)" }}
+                  >
+                    {entry.blockedReason}
                   </p>
                 )}
 

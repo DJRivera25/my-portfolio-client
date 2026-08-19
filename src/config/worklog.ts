@@ -71,3 +71,10 @@ export const inboxContent = {
   unreadLabel: "New",
 } as const;
 
+
+export const VIEW_MODES = [
+  { label: "Board", value: "board" as const },
+  { label: "List", value: "list" as const },
+];
+
+export type WorklogView = (typeof VIEW_MODES)[number]["value"];
