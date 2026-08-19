@@ -4,13 +4,26 @@
       "Bash(npm run dev)",
       "Bash(npm run build)",
       "Bash(npm run start)",
+      "Bash(npm run type-check)",
+      "Bash(npm run type-check:*)",
+      "Bash(npm test)",
+      "Bash(npm test:*)",
+      "Bash(npm run test:*)",
       "Bash(npm install)",
       "Bash(npm install:*)",
       "Bash(npm ci)",
       "Bash(npx tsc --noEmit)",
       "Bash(npx tsc --noEmit:*)",
+      "Bash(npx vitest run)",
+      "Bash(npx vitest run:*)",
       "Bash(node .claude/hooks/no-auto-commit.mjs)",
       "Bash(node .claude/hooks/no-auto-commit.mjs:*)",
+      "Bash(node .claude/hooks/doc-sync.mjs)",
+      "Bash(node .claude/hooks/doc-sync.mjs:*)",
+      "Bash(node .claude/hooks/typecheck-gate.mjs)",
+      "Bash(node .claude/hooks/typecheck-gate.mjs:*)",
+      "Bash(node .claude/hooks/touched-files-track.mjs)",
+      "Bash(node .claude/hooks/touched-files-track.mjs:*)",
       "Bash(git status)",
       "Bash(git status:*)",
       "Bash(git diff)",
@@ -31,6 +44,39 @@
           {
             "type": "command",
             "command": "node .claude/hooks/no-auto-commit.mjs"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/touched-files-track.mjs"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/typecheck-gate.mjs",
+            "timeout": 200,
+            "statusMessage": "Type-check + test gate"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/doc-sync.mjs",
+            "timeout": 30,
+            "statusMessage": "Doc-sync audit"
           }
         ]
       }

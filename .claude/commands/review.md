@@ -25,7 +25,7 @@ Steps:
 - Path aliases used correctly (`@/lib`, `@/app`, `@/src`).
 - No new `any` without justification.
 - No hardcoded site name / contact info — use `siteConfig` from `@/lib/site`.
-- No hardcoded marketing copy — use `src/config/content.ts`.
+- No hardcoded marketing copy — use `src/config/atelier.ts` (homepage) or `src/config/worklog.ts`. `content.ts` / `navigation.ts` / `toolCategories.ts` are retired.
 
 **Domain manifest sync**
 - If a new file lives outside the existing `domains.*.paths` globs, suggest which domain it belongs to (or whether a new domain is warranted).
