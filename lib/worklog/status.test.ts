@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { resolveCompletedAt } from "./status";
-import { deriveProjectName, projectMatchKey, slugifyProject } from "./slug";
+import { deriveProjectName, groupKey, projectMatchKey, slugifyProject } from "./slug";
 
 const now = new Date("2026-08-18T12:00:00.000Z");
 
@@ -51,6 +51,23 @@ describe("projectMatchKey", () => {
 
   it("still distinguishes genuinely different projects", () => {
     expect(projectMatchKey("my-portfolio")).not.toBe(projectMatchKey("toolsaustralia"));
+  });
+});
+
+describe("groupKey", () => {
+  it("collapses every spelling of a ticket to one group", () => {
+    const spellings = ["HCLUB-46", "hclub-46", "hclub 46", "HCLUB 46", "hclub46"];
+    expect(new Set(spellings.map(groupKey)).size).toBe(1);
+    expect(groupKey("HCLUB-46")).toBe("hclub46");
+  });
+
+  it("keeps genuinely different workstreams apart", () => {
+    expect(groupKey("merchandise")).not.toBe(groupKey("membership"));
+    expect(groupKey("HCLUB-46")).not.toBe(groupKey("HCLUB-47"));
+  });
+
+  it("agrees with projectMatchKey, since both are the same identity rule", () => {
+    expect(groupKey("Tools Australia")).toBe(projectMatchKey("Tools Australia"));
   });
 });
 

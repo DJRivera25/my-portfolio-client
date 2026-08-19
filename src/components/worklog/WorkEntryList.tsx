@@ -76,6 +76,11 @@ const WorkEntryList: React.FC<Props> = ({ entries, attachmentsByEntry, busyRef, 
                       {entry.project.name}
                     </span>
                   )}
+                  {entry.group && (
+                    <span className="rounded border border-atelier-gold/30 px-1.5 py-0.5 font-codet text-[10px] text-atelier-gold/90">
+                      {entry.group}
+                    </span>
+                  )}
                   <span className="font-codet text-[11px] text-atelier-faint">
                     {relative(entry.createdAt)}
                   </span>

@@ -14,6 +14,8 @@ const WorkAttachmentSchema = new Schema(
     entry: { type: Schema.Types.ObjectId, ref: "WorkEntry" },
     kind: { type: String, enum: WORK_ATTACHMENT_KINDS, default: "link" },
     label: { type: String, required: true, trim: true },
+    group: { type: String, trim: true },
+    groupKey: { type: String, trim: true, lowercase: true },
     url: { type: String, required: true, trim: true },
   },
   { timestamps: true }
@@ -21,6 +23,7 @@ const WorkAttachmentSchema = new Schema(
 
 WorkAttachmentSchema.index({ project: 1, createdAt: -1 });
 WorkAttachmentSchema.index({ entry: 1, createdAt: -1 });
+WorkAttachmentSchema.index({ project: 1, groupKey: 1, createdAt: -1 });
 
 // The same URL should not pile up on one entry when a step is re-run. Scoped to the
 // entry rather than globally, because the same artifact can legitimately be attached

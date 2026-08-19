@@ -17,8 +17,22 @@ export function slugifyProject(input: string): string {
  * quietly missing half its entries. The readable `slug` is still what gets displayed;
  * this is only the identity used for matching.
  */
-export function projectMatchKey(input: string): string {
+export function separatorFreeKey(input: string): string {
   return slugifyProject(input).replace(/-/g, "");
+}
+
+export function projectMatchKey(input: string): string {
+  return separatorFreeKey(input);
+}
+
+/**
+ * Groups gather related entries within a project — a feature, a ticket, a workstream
+ * ("HCLUB-46", "merchandise"). Keyed the same separator-free way as projects and for
+ * the same reason: "HCLUB-46", "hclub 46" and "hclub-46" are one group, not three.
+ * The first spelling seen is what gets displayed.
+ */
+export function groupKey(input: string): string {
+  return separatorFreeKey(input);
 }
 
 /** A display name for a project auto-created by its first `log_work` call. */

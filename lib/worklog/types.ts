@@ -28,6 +28,8 @@ export type WorkEntryLike = {
   status: WorkEntryStatus;
   blockedReason?: string | null;
   tags?: string[] | null;
+  group?: string | null;
+  groupKey?: string | null;
   minutesSpent?: number | null;
   branch?: string | null;
   commitSha?: string | null;
@@ -109,6 +111,18 @@ export type WorkAttachmentSummary = {
   label: string;
   url: string;
   entryRef: number | null;
+  group: string | null;
   project: { name: string; slug: string } | null;
   createdAt: string;
+};
+
+export type WorkGroupSummary = {
+  key: string;
+  name: string;
+  project: { name: string; slug: string } | null;
+  total: number;
+  open: number;
+  blocked: number;
+  minutesSpent: number;
+  lastActivityAt: string | null;
 };

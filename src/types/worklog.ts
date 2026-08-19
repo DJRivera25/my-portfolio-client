@@ -9,6 +9,7 @@ export interface WorkEntry {
   status: WorkEntryStatus;
   blockedReason?: string | null;
   tags?: string[];
+  group?: string | null;
   minutesSpent?: number | null;
   branch?: string | null;
   commitSha?: string | null;
@@ -76,6 +77,7 @@ export interface WorkAttachmentSummary {
   label: string;
   url: string;
   entryRef: number | null;
+  group: string | null;
   project: { name: string; slug: string } | null;
   createdAt: string;
 }
@@ -86,4 +88,16 @@ export interface DashboardPayload {
   entries: WorkEntry[];
   sessions: WorkSessionSummary[];
   attachments: WorkAttachmentSummary[];
+  groups: WorkGroupSummary[];
+}
+
+export interface WorkGroupSummary {
+  key: string;
+  name: string;
+  project: { name: string; slug: string } | null;
+  total: number;
+  open: number;
+  blocked: number;
+  minutesSpent: number;
+  lastActivityAt: string | null;
 }

@@ -10,6 +10,10 @@ const WorkEntrySchema = new Schema(
     status: { type: String, enum: WORK_ENTRY_STATUSES, default: "done" },
     blockedReason: { type: String },
     tags: { type: [String], default: [] },
+    // Groups related entries within a project. groupKey is the separator-free
+    // identity; group keeps the first spelling seen, for display.
+    group: { type: String, trim: true },
+    groupKey: { type: String, trim: true, lowercase: true },
     minutesSpent: { type: Number },
     branch: { type: String },
     commitSha: { type: String, trim: true },
@@ -24,6 +28,7 @@ const WorkEntrySchema = new Schema(
 
 WorkEntrySchema.index({ project: 1, createdAt: -1 });
 WorkEntrySchema.index({ status: 1, createdAt: -1 });
+WorkEntrySchema.index({ project: 1, groupKey: 1, createdAt: -1 });
 
 // Re-logging the same title within one session updates rather than duplicating.
 // `$type: "objectId"` and not `$exists: true`: an explicit `session: null` satisfies

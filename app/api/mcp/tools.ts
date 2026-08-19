@@ -4,9 +4,11 @@ import {
   buildReport,
   listWorkEntries,
   logWork,
+  setWorkEntryGroup,
   updateWorkEntryStatus,
 } from "@/lib/worklog/entries";
 import { listWorkProjects, setWorkProjectStatus } from "@/lib/worklog/projects";
+import { listWorkGroups } from "@/lib/worklog/groups";
 import { endSession, getSessionStatus } from "@/lib/worklog/sessions";
 import { attachLink, listAttachments } from "@/lib/worklog/attachmentQueries";
 import { formatEntries, formatReport } from "@/lib/worklog/format";
@@ -58,6 +60,15 @@ export function registerWorklogTools(server: McpServer) {
         summary: z.string().optional().describe("What actually changed, and why."),
         status: z.enum(WORK_ENTRY_STATUSES).optional().describe("Defaults to 'done'."),
         tags: z.array(z.string()).optional(),
+        group: z
+          .string()
+          .optional()
+          .describe(
+            "Gathers related entries under one label within the project — a ticket, " +
+              "feature or workstream, e.g. 'HCLUB-46' or 'merchandise'. Reuse the same " +
+              "label across every entry for that piece of work; spelling variations are " +
+              "matched, so 'HCLUB-46' and 'hclub 46' are one group. Attachments inherit it."
+          ),
         minutes_spent: z.number().int().positive().optional(),
         branch: z.string().optional(),
         commit_sha: z
@@ -83,6 +94,7 @@ export function registerWorklogTools(server: McpServer) {
         summary: input.summary,
         status: input.status,
         tags: input.tags,
+        group: input.group,
         minutesSpent: input.minutes_spent,
         branch: input.branch,
         commitSha: input.commit_sha,
@@ -106,6 +118,7 @@ export function registerWorklogTools(server: McpServer) {
         "redo something already logged.",
       inputSchema: z.object({
         project: z.string().optional().describe("Restrict to one project key."),
+        group: z.string().optional().describe("Restrict to one group label."),
         status: z.enum(WORK_ENTRY_STATUSES).optional(),
         since: sinceArg,
         limit: z.number().int().min(1).max(100).optional().describe("Defaults to 25."),
@@ -114,6 +127,7 @@ export function registerWorklogTools(server: McpServer) {
     async (input) => {
       const entries = await listWorkEntries({
         project: input.project,
+        group: input.group,
         status: input.status,
         since: parseSince(input.since),
         limit: input.limit,
@@ -285,6 +299,10 @@ export function registerWorklogTools(server: McpServer) {
           .int()
           .optional()
           .describe("Attach to this entry, e.g. 42 for '#42'. Omit to attach to the project."),
+        group: z
+          .string()
+          .optional()
+          .describe("Defaults to the entry's group, so files land with the work."),
       }),
     },
     async (input) => {
@@ -295,6 +313,7 @@ export function registerWorklogTools(server: McpServer) {
           label: input.label,
           kind: input.kind,
           entryRef: input.entry_ref,
+          group: input.group,
         });
         const where = a.entryRef ? ` to #${a.entryRef}` : "";
         return text(`Attached ${a.kind} #${a.ref}${where} — ${a.label}\n${a.url}`);
@@ -315,6 +334,7 @@ export function registerWorklogTools(server: McpServer) {
         "can be reopened.",
       inputSchema: z.object({
         project: z.string().optional(),
+        group: z.string().optional(),
         entry_ref: z.number().int().optional(),
         limit: z.number().int().min(1).max(200).optional(),
       }),
@@ -322,6 +342,7 @@ export function registerWorklogTools(server: McpServer) {
     async (input) => {
       const rows = await listAttachments({
         project: input.project,
+        group: input.group,
         entryRef: input.entry_ref,
         limit: input.limit,
       });
@@ -332,6 +353,61 @@ export function registerWorklogTools(server: McpServer) {
         return `${head}${where}\n     ${r.url}`;
       });
       return text(lines.join("\n"));
+    }
+  );
+
+  server.registerTool(
+    "list_groups",
+    {
+      title: "List groups",
+      description:
+        "List the groups work is gathered under — tickets, features, workstreams — with " +
+        "open and blocked counts for each. Use it to see what pieces of work are in " +
+        "flight before picking something up, or to find the right label to log against " +
+        "so a new entry joins existing related work rather than floating alone.",
+      inputSchema: z.object({
+        project: z.string().optional().describe("Restrict to one project key."),
+      }),
+    },
+    async (input) => {
+      const groups = await listWorkGroups(input.project);
+      if (!groups.length) {
+        return text("No groups yet. Pass `group` to log_work to start one.");
+      }
+      const lines = groups.map((g) => {
+        const where = g.project?.name ? ` [${g.project.name}]` : "";
+        const blocked = g.blocked ? ` · ${g.blocked} blocked` : "";
+        return `${g.name}${where} — ${g.total} logged · ${g.open} open${blocked}`;
+      });
+      return text(lines.join("\n"));
+    }
+  );
+  server.registerTool(
+    "set_work_group",
+    {
+      title: "Set work group",
+      description:
+        "Put existing entries into a group by their ref numbers, or clear the group by " +
+        "omitting it. Use this to gather work that was logged before it was clear the " +
+        "pieces belonged together — log_work cannot do it, because re-logging an old " +
+        "title from a new session creates a second entry rather than updating the first.",
+      inputSchema: z.object({
+        refs: z
+          .array(z.number().int())
+          .min(1)
+          .describe("Entry refs to group, e.g. [11, 12]."),
+        group: z
+          .string()
+          .optional()
+          .describe("The group label. Omit to remove these entries from their group."),
+      }),
+    },
+    async (input) => {
+      const updated = await setWorkEntryGroup(input.refs, input.group ?? null);
+      if (!updated.length) return text("No matching entries.");
+      const label = input.group ? `grouped under "${input.group}"` : "ungrouped";
+      const refs = updated.map((e) => `#${(e as unknown as { ref: number }).ref}`).join(", ");
+      return text(`${updated.length} entries ${label}: ${refs}`);
     }
   );
 }

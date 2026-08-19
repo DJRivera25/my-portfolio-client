@@ -5,7 +5,7 @@ import { nextSeq } from "../models/Counter";
 import { resolveWorkProject } from "./projects";
 import { syncSessionEntryCount, touchSession } from "./sessions";
 import { resolveCompletedAt } from "./status";
-import { projectMatchKey } from "./slug";
+import { groupKey, projectMatchKey } from "./slug";
 import { aggregateReport } from "./report";
 import type {
   ReportDigest,
@@ -22,6 +22,7 @@ export type LogWorkInput = {
   summary?: string;
   status?: WorkEntryStatus;
   tags?: string[];
+  group?: string;
   minutesSpent?: number;
   branch?: string;
   commitSha?: string;
@@ -34,6 +35,7 @@ export type LogWorkInput = {
 
 export type ListWorkFilter = {
   project?: string;
+  group?: string;
   status?: WorkEntryStatus;
   since?: Date;
   limit?: number;
@@ -47,6 +49,10 @@ function fieldsFrom(input: LogWorkInput, status: WorkEntryStatus): Record<string
   };
   if (input.summary !== undefined) set.summary = input.summary;
   if (input.tags !== undefined) set.tags = input.tags;
+  if (input.group !== undefined) {
+    set.group = input.group;
+    set.groupKey = groupKey(input.group);
+  }
   if (input.minutesSpent !== undefined) set.minutesSpent = input.minutesSpent;
   if (input.branch !== undefined) set.branch = input.branch;
   if (input.commitSha !== undefined) set.commitSha = input.commitSha;
@@ -113,6 +119,7 @@ export async function listWorkEntries(filter: ListWorkFilter = {}) {
     if (!project) return [];
     query.project = project._id;
   }
+  if (filter.group) query.groupKey = groupKey(filter.group);
   if (filter.status) query.status = filter.status;
   if (filter.since) query.createdAt = { $gte: filter.since };
 
@@ -141,6 +148,39 @@ export async function updateWorkEntryStatus(
   return WorkEntry.findOneAndUpdate({ ref }, { $set: set }, { new: true })
     .populate("project", PROJECT_FIELDS)
     .lean();
+}
+
+/**
+ * Groups entries that already exist. Without this, grouping would only ever apply to
+ * work logged after the feature landed — `log_work` cannot retrofit a label because its
+ * de-duplication is scoped to a session, so re-logging an old title from a new session
+ * creates a second entry instead of updating the first.
+ */
+export async function setWorkEntryGroup(refs: number[], group: string | null) {
+  await dbConnect();
+  if (!refs.length) return [];
+
+  const set = group
+    ? { group, groupKey: groupKey(group) }
+    : { group: null, groupKey: null };
+
+  await WorkEntry.updateMany({ ref: { $in: refs } }, { $set: set });
+
+  return WorkEntry.find({ ref: { $in: refs } })
+    .populate("project", PROJECT_FIELDS)
+    .lean();
+}
+
+/**
+ * Deletion is deliberately NOT exposed over MCP — only through the admin dashboard.
+ * Claude should be able to record and correct work, but removing history is a decision
+ * for the person who owns it.
+ */
+export async function deleteWorkEntries(refs: number[]) {
+  await dbConnect();
+  if (!refs.length) return 0;
+  const result = await WorkEntry.deleteMany({ ref: { $in: refs } });
+  return result.deletedCount ?? 0;
 }
 
 export async function buildReport(

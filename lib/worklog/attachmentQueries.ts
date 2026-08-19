@@ -4,6 +4,7 @@ import WorkEntry from "../models/WorkEntry";
 import { nextSeq } from "../models/Counter";
 import { resolveWorkProject } from "./projects";
 import { detectAttachmentKind, deriveAttachmentLabel, isProbablyUrl } from "./attachments";
+import { groupKey } from "./slug";
 import type { WorkAttachmentKind, WorkAttachmentSummary } from "./types";
 
 const PROJECT_FIELDS = "name slug";
@@ -14,6 +15,7 @@ export type AttachLinkInput = {
   label?: string;
   kind?: WorkAttachmentKind;
   entryRef?: number;
+  group?: string;
 };
 
 function summarise(doc: Record<string, unknown>): WorkAttachmentSummary {
@@ -26,6 +28,7 @@ function summarise(doc: Record<string, unknown>): WorkAttachmentSummary {
     label: String(doc.label ?? ""),
     url: String(doc.url ?? ""),
     entryRef: entry && typeof entry.ref === "number" ? entry.ref : null,
+    group: (doc.group as string) ?? null,
     project:
       project && typeof project.name === "string" && typeof project.slug === "string"
         ? { name: project.name, slug: project.slug }
@@ -45,7 +48,7 @@ export async function attachLink(input: AttachLinkInput): Promise<WorkAttachment
   const label = input.label?.trim() || deriveAttachmentLabel(input.url, kind);
 
   const entry = input.entryRef
-    ? await WorkEntry.findOne({ ref: input.entryRef }).select("_id")
+    ? await WorkEntry.findOne({ ref: input.entryRef }).select("_id group groupKey")
     : null;
   if (input.entryRef && !entry) {
     throw new Error(`No entry #${input.entryRef}`);
@@ -53,6 +56,16 @@ export async function attachLink(input: AttachLinkInput): Promise<WorkAttachment
 
   const set: Record<string, unknown> = { project: project._id, kind, label, url: input.url };
   if (entry) set.entry = entry._id;
+
+  // An explicit group wins; otherwise inherit the entry's, so a file lands in the same
+  // bucket as the work that produced it without the caller having to repeat itself.
+  if (input.group) {
+    set.group = input.group;
+    set.groupKey = groupKey(input.group);
+  } else if (entry?.group) {
+    set.group = entry.group;
+    set.groupKey = entry.groupKey;
+  }
 
   // Re-attaching the same URL to the same entry updates rather than duplicating,
   // matching how log_work behaves when a step is re-run.
@@ -73,11 +86,13 @@ export async function attachLink(input: AttachLinkInput): Promise<WorkAttachment
 }
 
 export async function listAttachments(
-  filter: { project?: string; entryRef?: number; limit?: number } = {}
+  filter: { project?: string; entryRef?: number; group?: string; limit?: number } = {}
 ): Promise<WorkAttachmentSummary[]> {
   await dbConnect();
 
   const query: Record<string, unknown> = {};
+
+  if (filter.group) query.groupKey = groupKey(filter.group);
 
   if (filter.entryRef !== undefined) {
     const entry = await WorkEntry.findOne({ ref: filter.entryRef }).select("_id");

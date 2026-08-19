@@ -14,6 +14,7 @@ import type { WorkEntryLike } from "@/lib/worklog/types";
 import type {
   WorkAttachmentSummary,
   WorkEntry,
+  WorkGroupSummary,
   WorkEntryStatus,
   WorkProjectSummary,
   WorkSessionSummary,
@@ -24,8 +25,10 @@ function WorklogDashboard() {
   const [entries, setEntries] = useState<WorkEntry[]>([]);
   const [sessions, setSessions] = useState<WorkSessionSummary[]>([]);
   const [attachments, setAttachments] = useState<WorkAttachmentSummary[]>([]);
+  const [groups, setGroups] = useState<WorkGroupSummary[]>([]);
 
   const [project, setProject] = useState<string | null>(null);
+  const [group, setGroup] = useState<string | null>(null);
   const [status, setStatus] = useState<WorkEntryStatus | null>(null);
   const [reportWindow, setReportWindow] = useState<string>("7d");
 
@@ -47,6 +50,7 @@ function WorklogDashboard() {
       setEntries(data.entries);
       setSessions(data.sessions);
       setAttachments(data.attachments ?? []);
+      setGroups(data.groups ?? []);
     } catch {
       setError("Could not load the worklog. Check that you are still signed in.");
     } finally {
@@ -64,9 +68,11 @@ function WorklogDashboard() {
     () =>
       entries.filter(
         (e) =>
-          (!project || e.project?.slug === project) && (!status || e.status === status)
+          (!project || e.project?.slug === project) &&
+          (!group || e.group === group) &&
+          (!status || e.status === status)
       ),
-    [entries, project, status]
+    [entries, project, group, status]
   );
 
   const report = useMemo(() => {
@@ -77,6 +83,11 @@ function WorklogDashboard() {
       since: parseSince(reportWindow),
     });
   }, [entries, project, reportWindow]);
+
+  const visibleGroups = useMemo(
+    () => (project ? groups.filter((g) => g.project?.slug === project) : groups),
+    [groups, project]
+  );
 
   const attachmentsByEntry = useMemo(() => {
     const map = new Map<number, WorkAttachmentSummary[]>();
@@ -141,7 +152,53 @@ function WorklogDashboard() {
           </div>
         ) : (
           <div className="flex flex-col gap-12">
-            <WorkProjectCards projects={projects} selected={project} onSelect={setProject} />
+            <WorkProjectCards
+              projects={projects}
+              selected={project}
+              onSelect={(slug) => {
+                setProject(slug);
+                setGroup(null);
+              }}
+            />
+
+            {visibleGroups.length > 0 && (
+              <section>
+                <h2 className="mb-4 font-codet text-xs tracking-[0.2em] text-atelier-muted">
+                  GROUPS
+                </h2>
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setGroup(null)}
+                    className={`rounded-md border px-2.5 py-1.5 font-codet text-[11px] transition-colors ${
+                      group === null
+                        ? "border-atelier-gold/55 text-atelier-gold"
+                        : "border-white/[0.12] text-atelier-faint hover:border-white/25"
+                    }`}
+                  >
+                    All
+                  </button>
+                  {visibleGroups.map((g) => (
+                    <button
+                      key={`${g.project?.slug ?? ""}:${g.key}`}
+                      type="button"
+                      onClick={() => setGroup(group === g.name ? null : g.name)}
+                      className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 font-codet text-[11px] transition-colors ${
+                        group === g.name
+                          ? "border-atelier-gold/55 text-atelier-gold"
+                          : "border-white/[0.12] text-atelier-muted hover:border-white/25"
+                      }`}
+                    >
+                      {g.name}
+                      <span className="text-atelier-faint">{g.total}</span>
+                      {g.blocked > 0 && (
+                        <span style={{ color: "#E07A5F" }}>{g.blocked}</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
 
             <WorkReportPanel
               report={report}

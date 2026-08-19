@@ -2,6 +2,7 @@ import { listWorkEntries } from "./entries";
 import { listWorkProjects } from "./projects";
 import { getSessionStatus } from "./sessions";
 import { listAttachments } from "./attachmentQueries";
+import { listWorkGroups } from "./groups";
 
 /**
  * Everything the dashboard needs, in one round trip.
@@ -16,12 +17,13 @@ import { listAttachments } from "./attachmentQueries";
  * MCP adapter and for anything that wants one slice.
  */
 export async function getDashboard(entryLimit = 300) {
-  const [projects, entries, sessions, attachments] = await Promise.all([
+  const [projects, entries, sessions, attachments, groups] = await Promise.all([
     listWorkProjects(),
     listWorkEntries({ limit: entryLimit }),
     getSessionStatus(),
     listAttachments({ limit: 200 }),
+    listWorkGroups(),
   ]);
 
-  return { projects, entries, sessions, attachments };
+  return { projects, entries, sessions, attachments, groups };
 }
