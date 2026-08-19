@@ -272,46 +272,6 @@ export function registerWorklogTools(server: McpServer) {
       description:
         "Attach a URL to a project or to a specific entry — a published Claude artifact, " +
         "a PR, a deploy preview, a spec, a repo. Call this immediately after publishing " +
-        "an artifact so the work and the thing it produced stay connected; an artifact " +
-        "URL is otherwise lost when the session ends. The kind is inferred from the URL, " +
-        "so you rarely need to pass it.",
-      inputSchema: z.object({
-        project: z.string().describe("Project key, e.g. 'toolsaustralia'."),
-        url: z.string().describe("The full https URL."),
-        label: z.string().optional().describe("What it is. Inferred from the URL if omitted."),
-        kind: z.enum(WORK_ATTACHMENT_KINDS).optional().describe("Inferred if omitted."),
-        entry_ref: z
-          .number()
-          .int()
-          .optional()
-          .describe("Attach to this entry, e.g. 42 for '#42'. Omit to attach to the project."),
-      }),
-    },
-    async (input) => {
-      try {
-        const a = await attachLink({
-          project: input.project,
-          url: input.url,
-          label: input.label,
-          kind: input.kind,
-          entryRef: input.entry_ref,
-        });
-        const where = a.entryRef ? ` to #${a.entryRef}` : "";
-        return text(`Attached ${a.kind} #${a.ref}${where} — ${a.label}
-${a.url}`);
-      } catch (err) {
-        return text(`Could not attach: ${(err as Error).message}`);
-      }
-    }
-  );
-
-  server.registerTool(
-    "attach_link",
-    {
-      title: "Attach link",
-      description:
-        "Attach a URL to a project or to a specific entry — a published Claude artifact, " +
-        "a PR, a deploy preview, a spec, a repo. Call this immediately after publishing " +
         "an artifact, so the work and the thing it produced stay connected; an artifact " +
         "URL is otherwise lost when the session ends. The kind is inferred from the URL, " +
         "so you rarely need to pass it.",
