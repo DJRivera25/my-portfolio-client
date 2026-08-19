@@ -13,7 +13,6 @@ import {
   fetchWorkReport,
   fetchWorkSessions,
   updateEntryStatus,
-  updateEntryVisibility,
 } from "../../src/lib/api/worklog";
 import type {
   ReportDigest,
@@ -78,18 +77,6 @@ function WorklogDashboard() {
     }
   };
 
-  const handleVisibilityToggle = async (entry: WorkEntry) => {
-    setBusyRef(entry.ref);
-    const next = entry.visibility === "public" ? "private" : "public";
-    try {
-      const updated = await updateEntryVisibility(entry.ref, next);
-      setEntries((prev) => prev.map((e) => (e.ref === entry.ref ? { ...e, ...updated } : e)));
-    } catch {
-      setError(`Could not change visibility for entry #${entry.ref}.`);
-    } finally {
-      setBusyRef(null);
-    }
-  };
 
   return (
     <main className="min-h-screen bg-atelier-ink px-6 pb-20 pt-24 max-[560px]:px-4">
@@ -173,7 +160,6 @@ function WorklogDashboard() {
                 entries={entries}
                 busyRef={busyRef}
                 onStatusChange={handleStatusChange}
-                onVisibilityToggle={handleVisibilityToggle}
               />
             </section>
 

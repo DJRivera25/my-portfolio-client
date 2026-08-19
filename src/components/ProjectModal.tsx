@@ -188,7 +188,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
   };
 
   const inputClass =
-    "w-full rounded-lg border border-hairline-strong bg-brand-navy/40 px-4 py-3 text-sm text-white placeholder:text-white/40 transition focus:border-accent-cyan focus:outline-none focus:ring-1 focus:ring-accent-cyan";
+    "at-field";
 
   return (
     <ModalFrame
@@ -279,20 +279,20 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
         />
 
         <div>
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-white/60">
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-atelier-muted">
             Highlights (case-study check cards)
           </p>
-          <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-hairline-strong bg-brand-navy/40 px-3 py-2 focus-within:border-accent-cyan focus-within:ring-1 focus-within:ring-accent-cyan">
+          <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-white/[0.12] bg-white/[0.03] px-3 py-2 focus-within:border-atelier-gold focus-within:ring-1 focus-within:ring-atelier-gold">
             {highlights.map((highlight) => (
               <span
                 key={highlight}
-                className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent-muted px-2.5 py-0.5 text-xs font-medium text-accent"
+                className="inline-flex items-center gap-1 rounded-full border border-atelier-gold/30 bg-atelier-gold/[0.12] px-2.5 py-0.5 text-xs font-medium text-atelier-gold"
               >
                 {highlight}
                 <button
                   type="button"
                   onClick={() => removeHighlight(highlight)}
-                  className="text-accent/70 transition hover:text-accent"
+                  className="text-atelier-gold/70 transition hover:text-atelier-gold"
                   aria-label={`Remove ${highlight}`}
                 >
                   <X className="h-3 w-3" />
@@ -302,7 +302,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
             <input
               type="text"
               placeholder={highlights.length === 0 ? "Highlights (Enter to add)" : "Add highlight…"}
-              className="flex-1 min-w-[120px] bg-transparent text-sm text-white placeholder:text-white/40 focus:outline-none"
+              className="flex-1 min-w-[120px] bg-transparent text-sm text-atelier-paper placeholder:text-atelier-faint focus:outline-none"
               value={highlightDraft}
               onChange={(e) => setHighlightDraft(e.target.value)}
               onKeyDown={handleHighlightKey}
@@ -312,17 +312,17 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
         </div>
 
         <div>
-          <div className="mb-2 flex flex-wrap items-center gap-1.5 rounded-lg border border-hairline-strong bg-brand-navy/40 px-3 py-2 focus-within:border-accent-cyan focus-within:ring-1 focus-within:ring-accent-cyan">
+          <div className="mb-2 flex flex-wrap items-center gap-1.5 rounded-lg border border-white/[0.12] bg-white/[0.03] px-3 py-2 focus-within:border-atelier-gold focus-within:ring-1 focus-within:ring-atelier-gold">
             {tags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center gap-1 rounded-full border border-accent-cyan/30 bg-accent-cyan-soft px-2.5 py-0.5 text-xs font-medium text-accent-cyan"
+                className="inline-flex items-center gap-1 rounded-full border border-atelier-gold/30 bg-atelier-gold/[0.12] px-2.5 py-0.5 text-xs font-medium text-atelier-gold"
               >
                 {tag}
                 <button
                   type="button"
                   onClick={() => removeTag(tag)}
-                  className="text-accent-cyan/70 transition hover:text-accent-cyan"
+                  className="text-atelier-gold/70 transition hover:text-atelier-gold"
                   aria-label={`Remove ${tag}`}
                 >
                   <X className="h-3 w-3" />
@@ -332,7 +332,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
             <input
               type="text"
               placeholder={tags.length === 0 ? "Tech stack (Enter or , to add)" : "Add tag…"}
-              className="flex-1 min-w-[120px] bg-transparent text-sm text-white placeholder:text-white/40 focus:outline-none"
+              className="flex-1 min-w-[120px] bg-transparent text-sm text-atelier-paper placeholder:text-atelier-faint focus:outline-none"
               value={tagDraft}
               onChange={(e) => setTagDraft(e.target.value)}
               onKeyDown={handleTagKey}
@@ -361,11 +361,11 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-bold uppercase tracking-wide text-brand-navy shadow-brand-glow transition hover:bg-accent-hover disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="at-btn w-full"
         >
           {loading ? (
             <>
-              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" />
+              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               Saving…
             </>
           ) : initialData ? (
@@ -388,12 +388,12 @@ type ImageInputProps = {
 };
 
 const ImageInput: React.FC<ImageInputProps> = ({ label, preview, inputRef, onChange, ratio }) => (
-  <div className="rounded-lg border border-hairline-strong bg-surface-glass p-3">
-    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-white/60">{label}</p>
+  <div className="rounded-lg border border-white/[0.12] bg-white/[0.04] p-3">
+    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-atelier-muted">{label}</p>
     <button
       type="button"
       onClick={() => inputRef.current?.click()}
-      className={`relative flex w-full items-center justify-center overflow-hidden rounded-md border border-dashed border-hairline-strong bg-brand-navy/40 text-xs text-white/55 transition hover:border-accent-cyan hover:text-accent-cyan ${ratio}`}
+      className={`relative flex w-full items-center justify-center overflow-hidden rounded-md border border-dashed border-white/[0.12] bg-white/[0.03] text-xs text-atelier-paper/55 transition hover:border-atelier-gold hover:text-atelier-gold ${ratio}`}
     >
       {preview ? (
         // eslint-disable-next-line @next/next/no-img-element

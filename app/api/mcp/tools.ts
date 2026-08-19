@@ -12,7 +12,6 @@ import { formatEntries, formatReport } from "@/lib/worklog/format";
 import { parseSince } from "@/lib/worklog/since";
 import {
   WORK_ENTRY_STATUSES,
-  WORK_ENTRY_VISIBILITIES,
   WORK_PROJECT_STATUSES,
   type WorkEntryLike,
 } from "@/lib/worklog/types";
@@ -65,10 +64,6 @@ export function registerWorklogTools(server: McpServer) {
           .string()
           .optional()
           .describe("The current Claude Code session id. Creates and tracks the session."),
-        visibility: z
-          .enum(WORK_ENTRY_VISIBILITIES)
-          .optional()
-          .describe("Defaults to 'private'. 'public' publishes it to the site's Build Log."),
       }),
     },
     async (input) => {
@@ -83,7 +78,6 @@ export function registerWorklogTools(server: McpServer) {
         prUrl: input.pr_url,
         blockedReason: input.blocked_reason,
         sessionId: input.session_id,
-        visibility: input.visibility,
       });
       return text(`Logged ${entryLine(entry as Record<string, unknown> | null)}`);
     }

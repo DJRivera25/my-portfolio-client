@@ -1,17 +1,18 @@
 /**
  * Shared worklog vocabulary. Deliberately free of mongoose and `@/lib/db` so the pure
- * layer (public/report/format/status/slug) stays unit-testable — `lib/db.ts` throws at
- * module scope when MONGODB_URI is unset, which would take any importing test with it.
+ * layer (report/format/status/slug) stays unit-testable — `lib/db.ts` throws at module
+ * scope when MONGODB_URI is unset, which would take any importing test with it.
  * The models import their enum values from here, so there is one source of truth.
+ *
+ * The worklog is entirely private: there is no visibility flag and no unauthenticated
+ * route. Every read goes through isAuthorizedAdmin or isAuthorizedMcp.
  */
 
 export const WORK_ENTRY_STATUSES = ["todo", "in_progress", "blocked", "done"] as const;
-export const WORK_ENTRY_VISIBILITIES = ["private", "public"] as const;
 export const WORK_PROJECT_STATUSES = ["active", "paused", "shipped", "archived"] as const;
 export const WORK_SESSION_STATUSES = ["active", "ended"] as const;
 
 export type WorkEntryStatus = (typeof WORK_ENTRY_STATUSES)[number];
-export type WorkEntryVisibility = (typeof WORK_ENTRY_VISIBILITIES)[number];
 export type WorkProjectStatus = (typeof WORK_PROJECT_STATUSES)[number];
 export type WorkSessionStatus = (typeof WORK_SESSION_STATUSES)[number];
 
@@ -31,22 +32,11 @@ export type WorkEntryLike = {
   branch?: string | null;
   prUrl?: string | null;
   source?: string | null;
-  visibility?: WorkEntryVisibility | null;
   completedAt?: Date | string | null;
   createdAt: Date | string;
   updatedAt?: Date | string | null;
   project?: ProjectRef | unknown;
   session?: unknown;
-};
-
-/** The only shape that may reach an unauthenticated caller. */
-export type PublicEntry = {
-  ref: number;
-  title: string;
-  summary: string | null;
-  tags: string[];
-  createdAt: string;
-  project: { name: string; slug: string } | null;
 };
 
 export type ReportProjectLine = {

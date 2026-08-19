@@ -27,9 +27,6 @@ import SiteFooter from "./SiteFooter";
 import MobileBottomNav from "./MobileBottomNav";
 import CaseStudyDrawer from "./CaseStudyDrawer";
 import CommandPalette from "./CommandPalette";
-import BuildLogSection from "./BuildLogSection";
-import { fetchPublicEntries } from "../../lib/api/worklog";
-import type { PublicEntry } from "../../types/worklog";
 
 type SocialLink = { platform: string; url: string; icon?: string };
 
@@ -53,7 +50,6 @@ const PortfolioPage: React.FC = () => {
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [socials, setSocials] = useState<SocialLink[]>(defaultSocials);
-  const [buildLog, setBuildLog] = useState<PublicEntry[]>([]);
   // Stack section is a curated set of the four stacks I build with.
   const groups = stackGroups;
 
@@ -97,12 +93,6 @@ const PortfolioPage: React.FC = () => {
       .get<Social[]>("/api/socials")
       .then((res) => {
         if (alive && res.data?.length) setSocials(mergeSocials(res.data));
-      })
-      .catch(() => {});
-
-    fetchPublicEntries()
-      .then((data) => {
-        if (alive && Array.isArray(data)) setBuildLog(data);
       })
       .catch(() => {});
 
@@ -237,8 +227,7 @@ const PortfolioPage: React.FC = () => {
         <SelectedWork />
         <AboutSection />
         <StackSection groups={groups} />
-        <HowIShip />
-        <BuildLogSection entries={buildLog} />
+        <HowIShip />
         <ResumeSection />
         <ContactSection socials={socials} />
         <SiteFooter />

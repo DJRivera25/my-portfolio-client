@@ -288,3 +288,76 @@ code {
     text-align: right !important;
   }
 }
+
+/* ------------------------------------------------------------------
+   Atelier form controls — shared by /login and every admin modal so the
+   signed-in surfaces match the homepage instead of the retired navy theme.
+   ------------------------------------------------------------------ */
+@layer components {
+  .at-label {
+    @apply mb-2 block font-codet text-[11px] uppercase tracking-[0.14em] text-atelier-faint;
+  }
+
+  .at-field {
+    @apply w-full rounded-lg border border-white/[0.12] bg-white/[0.03] px-3.5 py-2.5
+           text-[15px] text-atelier-paper placeholder:text-atelier-faint
+           transition-colors outline-none;
+  }
+  .at-field:focus {
+    @apply border-atelier-gold/60 bg-white/[0.05];
+    box-shadow: 0 0 0 3px rgba(224, 165, 61, 0.14);
+  }
+  .at-field:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+
+  textarea.at-field {
+    @apply min-h-[110px] resize-y leading-relaxed;
+  }
+
+  select.at-field {
+    @apply cursor-pointer bg-atelier-ink;
+  }
+
+  .at-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-atelier-gold/60
+           bg-atelier-gold/[0.14] px-5 py-2.5 font-codet text-[12px] uppercase tracking-[0.12em]
+           text-atelier-gold transition-colors;
+  }
+  .at-btn:hover:not(:disabled) {
+    @apply border-atelier-gold bg-atelier-gold/[0.22];
+  }
+  .at-btn:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+
+  .at-btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-white/[0.14]
+           px-5 py-2.5 font-codet text-[12px] uppercase tracking-[0.12em] text-atelier-muted
+           transition-colors;
+  }
+  .at-btn-ghost:hover:not(:disabled) {
+    @apply border-white/30 text-atelier-paper;
+  }
+
+  .at-btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border px-5 py-2.5
+           font-codet text-[12px] uppercase tracking-[0.12em] transition-colors;
+    border-color: rgba(224, 122, 95, 0.45);
+    color: #e07a5f;
+  }
+  .at-btn-danger:hover:not(:disabled) {
+    border-color: rgba(224, 122, 95, 0.8);
+    background: rgba(224, 122, 95, 0.1);
+  }
+
+  .at-card {
+    @apply rounded-xl border border-white/[0.09] bg-white/[0.02];
+  }
+}
+
+/* Keyboard focus is visible everywhere in the signed-in areas. */
+:focus-visible {
+  outline: 2px solid rgba(224, 165, 61, 0.7);
+  outline-offset: 2px;
+}

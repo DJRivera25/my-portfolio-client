@@ -36,7 +36,6 @@ export const worklogContent = {
   reportTitle: "Report",
   projectsTitle: "Projects",
   filterAll: "All",
-  publishHint: "Publish to the site's public Build Log",
 } as const;
 
 export const REPORT_WINDOWS = [
@@ -45,12 +44,30 @@ export const REPORT_WINDOWS = [
   { label: "All time", value: "" },
 ] as const;
 
-/** Public Build Log section on the portfolio home. */
-export const buildLogContent = {
-  eyebrow: "BUILD LOG",
-  headingTop: "Recently ",
-  headingAccent: "shipped",
-  subhead:
-    "A live feed from my worklog — written as the work happens, not reconstructed afterwards.",
-  emptyNote: "Nothing published yet.",
+/** Sign-in page copy. */
+export const loginContent = {
+  back: "Back to site",
+  eyebrow: "ADMIN",
+  heading: "Sign ",
+  headingAccent: "in",
+  subhead: "The worklog, inbox and content tools live behind here.",
+  emailLabel: "Email",
+  passwordLabel: "Password",
+  submit: "Sign in",
+  submitting: "Signing in…",
+  success: "Signed in.",
+  failure: "Could not sign in. Check your email and password.",
 } as const;
+
+/** Admin inbox copy. */
+export const inboxContent = {
+  eyebrow: "INBOX",
+  heading: "Messages",
+  headingAccent: " received",
+  subhead: "Everything sent through the contact form on the site.",
+  empty: "No messages yet.",
+  emptyBody: "Anything sent through the site's contact form will land here.",
+  error: "Could not load messages. Check that you are still signed in.",
+  unreadLabel: "New",
+} as const;
+

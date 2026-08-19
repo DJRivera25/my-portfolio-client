@@ -3,15 +3,12 @@ import { isAuthorizedAdmin, unauthorizedResponse } from "@/lib/auth";
 import {
   listWorkEntries,
   logWork,
-  setWorkEntryVisibility,
   updateWorkEntryStatus,
 } from "@/lib/worklog/entries";
 import { parseSince } from "@/lib/worklog/since";
 import {
   WORK_ENTRY_STATUSES,
-  WORK_ENTRY_VISIBILITIES,
   type WorkEntryStatus,
-  type WorkEntryVisibility,
 } from "@/lib/worklog/types";
 
 export const runtime = "nodejs";
@@ -19,12 +16,6 @@ export const runtime = "nodejs";
 function asStatus(value: string | null): WorkEntryStatus | undefined {
   return WORK_ENTRY_STATUSES.includes(value as WorkEntryStatus)
     ? (value as WorkEntryStatus)
-    : undefined;
-}
-
-function asVisibility(value: unknown): WorkEntryVisibility | undefined {
-  return WORK_ENTRY_VISIBILITIES.includes(value as WorkEntryVisibility)
-    ? (value as WorkEntryVisibility)
     : undefined;
 }
 
@@ -64,16 +55,9 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ message: "ref is required" }, { status: 400 });
   }
 
-  const visibility = asVisibility(body?.visibility);
-  if (visibility) {
-    const updated = await setWorkEntryVisibility(ref, visibility);
-    if (!updated) return NextResponse.json({ message: "Entry not found" }, { status: 404 });
-    return NextResponse.json(updated);
-  }
-
   const status = asStatus(body?.status ?? null);
   if (!status) {
-    return NextResponse.json({ message: "A valid status or visibility is required" }, { status: 400 });
+    return NextResponse.json({ message: "A valid status is required" }, { status: 400 });
   }
 
   const updated = await updateWorkEntryStatus(ref, status, body?.blockedReason);

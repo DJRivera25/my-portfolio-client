@@ -1,5 +1,4 @@
 export type WorkEntryStatus = "todo" | "in_progress" | "blocked" | "done";
-export type WorkEntryVisibility = "private" | "public";
 export type WorkProjectStatus = "active" | "paused" | "shipped" | "archived";
 
 export interface WorkEntry {
@@ -14,7 +13,6 @@ export interface WorkEntry {
   branch?: string | null;
   prUrl?: string | null;
   source?: string;
-  visibility: WorkEntryVisibility;
   completedAt?: string | null;
   createdAt: string;
   project?: { _id: string; name: string; slug: string } | null;
@@ -57,14 +55,4 @@ export interface ReportDigest {
     minutesSpent: number;
   }>;
   blockers: Array<{ ref: number; title: string; project: string; reason: string | null }>;
-}
-
-/** The public feed shape — deliberately narrower than WorkEntry. */
-export interface PublicEntry {
-  ref: number;
-  title: string;
-  summary: string | null;
-  tags: string[];
-  createdAt: string;
-  project: { name: string; slug: string } | null;
 }

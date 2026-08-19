@@ -1,6 +1,5 @@
 import "../src/index.css";
-import Navbar from "../src/components/Navbar";
-import Footer from "../src/components/Footer";
+import AdminBar from "../src/components/AdminBar";
 import { AuthProvider } from "../src/context/AuthContext";
 import type { ReactNode } from "react";
 import { ToastContainer } from "react-toastify";
@@ -63,12 +62,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       lang="en"
       className={`${GeistSans.variable} ${GeistMono.variable} ${instrumentSerif.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
     >
-      <body className="font-sans bg-brand-navy text-white antialiased">
+      {/* Atelier ink is the ground for every route. The homepage paints its own; the
+          signed-in pages inherit it here rather than the retired navy theme. */}
+      <body className="font-grotesk bg-atelier-ink text-atelier-paper antialiased">
         <AuthProvider>
-          <Navbar />
+          <AdminBar />
           <ToastContainer position="top-right" autoClose={3000} theme="dark" />
           {children}
-          <Footer />
         </AuthProvider>
       </body>
     </html>

@@ -22,12 +22,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (!allowed) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-brand-navy text-white gap-3">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-atelier-ink text-atelier-paper gap-3">
         <span
-          className="inline-block h-10 w-10 border-2 border-accent border-t-transparent rounded-full animate-spin"
+          className="inline-block h-10 w-10 border-2 border-atelier-gold border-t-transparent rounded-full animate-spin"
           aria-hidden
         />
-        <span className="text-sm text-white/70">Checking session…</span>
+        <span className="text-sm text-atelier-muted">Checking session…</span>
       </div>
     );
   }

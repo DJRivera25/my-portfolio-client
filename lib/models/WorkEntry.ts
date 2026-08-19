@@ -1,5 +1,5 @@
 import { Schema, models, model } from "mongoose";
-import { WORK_ENTRY_STATUSES, WORK_ENTRY_VISIBILITIES } from "../worklog/types";
+import { WORK_ENTRY_STATUSES } from "../worklog/types";
 
 const WorkEntrySchema = new Schema(
   {
@@ -15,7 +15,6 @@ const WorkEntrySchema = new Schema(
     prUrl: { type: String },
     session: { type: Schema.Types.ObjectId, ref: "WorkSession" },
     source: { type: String, default: "claude" },
-    visibility: { type: String, enum: WORK_ENTRY_VISIBILITIES, default: "private" },
     completedAt: { type: Date },
   },
   { timestamps: true }
@@ -23,7 +22,6 @@ const WorkEntrySchema = new Schema(
 
 WorkEntrySchema.index({ project: 1, createdAt: -1 });
 WorkEntrySchema.index({ status: 1, createdAt: -1 });
-WorkEntrySchema.index({ visibility: 1, createdAt: -1 });
 
 // Re-logging the same title within one session updates rather than duplicating.
 // `$type: "objectId"` and not `$exists: true`: an explicit `session: null` satisfies

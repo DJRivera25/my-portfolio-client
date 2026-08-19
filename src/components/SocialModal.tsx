@@ -86,7 +86,7 @@ const SocialModal: React.FC<SocialModalProps> = ({ isOpen, onClose, onSaved, ini
         <input
           type="text"
           placeholder="Platform (e.g. Facebook)"
-          className="w-full rounded-lg border border-hairline-strong bg-brand-navy/40 px-4 py-3 text-sm text-white placeholder:text-white/40 transition focus:border-accent-cyan focus:outline-none focus:ring-1 focus:ring-accent-cyan"
+          className="at-field"
           value={platform}
           onChange={(e) => setPlatform(e.target.value)}
           required
@@ -95,7 +95,7 @@ const SocialModal: React.FC<SocialModalProps> = ({ isOpen, onClose, onSaved, ini
         <input
           type="url"
           placeholder="URL (https://...)"
-          className="w-full rounded-lg border border-hairline-strong bg-brand-navy/40 px-4 py-3 text-sm text-white placeholder:text-white/40 transition focus:border-accent-cyan focus:outline-none focus:ring-1 focus:ring-accent-cyan"
+          className="at-field"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           required
@@ -105,13 +105,13 @@ const SocialModal: React.FC<SocialModalProps> = ({ isOpen, onClose, onSaved, ini
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="rounded-lg border border-hairline-strong bg-surface-glass px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white transition hover:border-accent-cyan hover:text-accent-cyan"
+            className="at-btn-ghost"
           >
             {iconFile || preview ? "Change icon" : "Upload icon"}
           </button>
           {preview && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={preview} alt="Preview" className="h-12 w-12 rounded-lg border border-hairline-strong object-cover bg-white/5" />
+            <img src={preview} alt="Preview" className="h-12 w-12 rounded-lg border border-white/[0.12] object-cover bg-white/5" />
           )}
           <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
         </div>
@@ -119,11 +119,11 @@ const SocialModal: React.FC<SocialModalProps> = ({ isOpen, onClose, onSaved, ini
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-bold uppercase tracking-wide text-brand-navy shadow-brand-glow transition hover:bg-accent-hover disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="at-btn w-full"
         >
           {loading ? (
             <>
-              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" />
+              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               Saving…
             </>
           ) : initialData ? (

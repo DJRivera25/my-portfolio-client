@@ -1,13 +1,13 @@
 "use client";
-import { useState } from "react";
-import { motion } from "framer-motion";
-import api from "../../src/lib/api/client";
-import { toast } from "react-toastify";
-import { useAuth } from "../../src/context/AuthContext";
-import { useRouter } from "next/navigation";
 
-const yellow = "#FFD600";
-const darkBlue = "#0a0f29";
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import api from "../../src/lib/api/client";
+import { useAuth } from "../../src/context/AuthContext";
+import { loginContent } from "../../src/config/worklog";
 
 export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -25,84 +25,104 @@ export default function LoginPage() {
     try {
       const res = await api.post<{ token: string }>("/api/auth/login", form);
       login(res.data.token);
-      toast.success("Login successful!");
-      router.push("/"); // or "/inbox" if you want to redirect to inbox
+      toast.success(loginContent.success);
+      router.push("/worklog");
     } catch (err: unknown) {
       const msg =
         err && typeof err === "object" && "response" in err
           ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
           : undefined;
-      toast.error(msg || "Login failed");
+      toast.error(msg || loginContent.failure);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <motion.section
-      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a0f29] via-[#1a1f3a] to-[#23284a] px-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-    >
-      <motion.form
-        onSubmit={handleSubmit}
-        className="w-full max-w-md bg-white/90 rounded-3xl shadow-2xl border border-yellow-100 p-10 flex flex-col gap-6 relative z-10"
-        initial={{ y: 40, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.7, type: "spring" }}
-      >
-        <h2 className="text-3xl font-bold text-center text-[#0a0f29] mb-2">Login</h2>
-        <div className="h-1 w-24 bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-400 rounded-full mx-auto mb-6" />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          className="w-full border-b-2 bg-transparent text-[#0a0f29] placeholder-[#0a0f29]/60 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-lg py-2"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          className="w-full border-b-2 bg-transparent text-[#0a0f29] placeholder-[#0a0f29]/60 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-lg py-2"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
-        <motion.button
-          type="submit"
-          className="border border-yellow-400 px-8 py-3 text-white bg-yellow-400 hover:bg-yellow-300 hover:text-black font-bold rounded-full transition flex items-center justify-center relative overflow-hidden shadow-lg mt-4"
-          disabled={loading}
-          whileHover={{ scale: 1.04, boxShadow: `0 0 16px 2px ${yellow}` }}
-          whileTap={{ scale: 0.97 }}
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 py-20 max-[560px]:px-4">
+      {/* One quiet gold bloom, echoing the homepage cursor glow without the interactivity. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/3 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(224,165,61,0.10) 0%, rgba(224,165,61,0.03) 40%, transparent 70%)",
+        }}
+      />
+
+      <div className="relative z-10 w-full max-w-[400px]">
+        <Link
+          href="/"
+          className="mb-10 inline-flex items-center gap-2 font-codet text-[11px] uppercase tracking-[0.14em] text-atelier-faint transition-colors hover:text-atelier-paper"
         >
-          {loading ? (
-            <span className="flex items-center gap-2">
-              <svg
-                className="animate-spin h-5 w-5 mr-2 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-              </svg>
-              Logging in...
-            </span>
-          ) : (
-            "Login"
-          )}
-          <motion.span
-            className="absolute inset-0 rounded-full"
-            initial={{ opacity: 0 }}
-            whileTap={{ opacity: 0.2, scale: 1.2, background: yellow }}
-            transition={{ duration: 0.3 }}
-          />
-        </motion.button>
-      </motion.form>
-    </motion.section>
+          <ArrowLeft size={13} aria-hidden />
+          {loginContent.back}
+        </Link>
+
+        <div className="mb-7 flex items-center gap-3.5">
+          <span className="h-px w-11 bg-atelier-gold" />
+          <span className="font-codet text-xs tracking-[0.2em] text-atelier-muted">
+            {loginContent.eyebrow}
+          </span>
+        </div>
+
+        <h1 className="m-0 font-serifd text-[clamp(34px,7vw,46px)] font-normal leading-[1.06] text-atelier-paper">
+          {loginContent.heading}
+          <span className="italic text-atelier-gold">{loginContent.headingAccent}</span>.
+        </h1>
+        <p className="m-0 mb-9 mt-4 text-[15px] leading-[1.6] text-[#9D988E]">
+          {loginContent.subhead}
+        </p>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <div>
+            <label htmlFor="email" className="at-label">
+              {loginContent.emailLabel}
+            </label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              autoComplete="email"
+              className="at-field"
+              placeholder="you@example.com"
+              value={form.email}
+              onChange={handleChange}
+              disabled={loading}
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="at-label">
+              {loginContent.passwordLabel}
+            </label>
+            <input
+              id="password"
+              type="password"
+              name="password"
+              autoComplete="current-password"
+              className="at-field"
+              placeholder="••••••••"
+              value={form.password}
+              onChange={handleChange}
+              disabled={loading}
+              required
+            />
+          </div>
+
+          <button type="submit" className="at-btn mt-2 w-full" disabled={loading}>
+            {loading ? (
+              <>
+                <Loader2 size={14} className="animate-spin" aria-hidden />
+                {loginContent.submitting}
+              </>
+            ) : (
+              loginContent.submit
+            )}
+          </button>
+        </form>
+      </div>
+    </main>
   );
 }

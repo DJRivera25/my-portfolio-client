@@ -6,14 +6,11 @@ import { resolveWorkProject } from "./projects";
 import { syncSessionEntryCount, touchSession } from "./sessions";
 import { resolveCompletedAt } from "./status";
 import { projectMatchKey } from "./slug";
-import { toPublicEntry } from "./public";
 import { aggregateReport } from "./report";
 import type {
-  PublicEntry,
   ReportDigest,
   WorkEntryLike,
   WorkEntryStatus,
-  WorkEntryVisibility,
 } from "./types";
 
 const ENTRY_LIMIT_MAX = 500;
@@ -30,7 +27,6 @@ export type LogWorkInput = {
   prUrl?: string;
   blockedReason?: string;
   sessionId?: string;
-  visibility?: WorkEntryVisibility;
   source?: string;
 };
 
@@ -38,7 +34,6 @@ export type ListWorkFilter = {
   project?: string;
   status?: WorkEntryStatus;
   since?: Date;
-  visibility?: WorkEntryVisibility;
   limit?: number;
 };
 
@@ -53,7 +48,6 @@ function fieldsFrom(input: LogWorkInput, status: WorkEntryStatus): Record<string
   if (input.minutesSpent !== undefined) set.minutesSpent = input.minutesSpent;
   if (input.branch !== undefined) set.branch = input.branch;
   if (input.prUrl !== undefined) set.prUrl = input.prUrl;
-  if (input.visibility !== undefined) set.visibility = input.visibility;
   if (input.blockedReason !== undefined) set.blockedReason = input.blockedReason;
   return set;
 }
@@ -116,7 +110,6 @@ export async function listWorkEntries(filter: ListWorkFilter = {}) {
     query.project = project._id;
   }
   if (filter.status) query.status = filter.status;
-  if (filter.visibility) query.visibility = filter.visibility;
   if (filter.since) query.createdAt = { $gte: filter.since };
 
   return WorkEntry.find(query)
@@ -146,13 +139,6 @@ export async function updateWorkEntryStatus(
     .lean();
 }
 
-export async function setWorkEntryVisibility(ref: number, visibility: WorkEntryVisibility) {
-  await dbConnect();
-  return WorkEntry.findOneAndUpdate({ ref }, { $set: { visibility } }, { new: true })
-    .populate("project", PROJECT_FIELDS)
-    .lean();
-}
-
 export async function buildReport(
   opts: { project?: string; since?: Date } = {}
 ): Promise<ReportDigest> {
@@ -162,22 +148,4 @@ export async function buildReport(
     limit: ENTRY_LIMIT_MAX,
   });
   return aggregateReport(entries as unknown as WorkEntryLike[], { since: opts.since });
-}
-
-/**
- * The only query an unauthenticated caller can reach. Selects the allowed fields at the
- * database, then projects again through `toPublicEntry` — belt and braces, because this
- * is the one place where a mistake puts client data on a public page.
- */
-export async function listPublicEntries(limit = 20): Promise<PublicEntry[]> {
-  await dbConnect();
-
-  const rows = await WorkEntry.find({ visibility: "public" })
-    .select("ref title summary tags createdAt project")
-    .sort({ createdAt: -1 })
-    .limit(Math.min(limit, 50))
-    .populate("project", PROJECT_FIELDS)
-    .lean();
-
-  return rows.map((row: unknown) => toPublicEntry(row as WorkEntryLike));
 }

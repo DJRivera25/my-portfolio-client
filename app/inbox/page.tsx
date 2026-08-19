@@ -1,77 +1,127 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import ProtectedRoute from "../../src/components/ProtectedRoute";
 import api from "../../src/lib/api/client";
+import { inboxContent } from "../../src/config/worklog";
 import type { Message } from "../../src/types/portfolio";
 
-const yellow = "#FFD600";
+function relative(iso?: string): string {
+  if (!iso) return "";
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.round(diff / 60000);
+  if (mins < 60) return `${Math.max(mins, 0)}m ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.round(hours / 24);
+  return days < 30 ? `${days}d ago` : new Date(iso).toLocaleDateString();
+}
 
-export default function InboxPage() {
+function InboxView() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     api
       .get<Message[]>("/api/messages")
-      .then((res) => setMessages(res.data))
-      .catch(() => setMessages([]))
+      .then((res) => setMessages(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setError(inboxContent.error))
       .finally(() => setLoading(false));
   }, []);
 
+  const unread = messages.filter((m) => !m.hasViewed).length;
+
+  return (
+    <main className="min-h-screen px-6 pb-20 pt-14 max-[560px]:px-4">
+      <div className="mx-auto max-w-[820px]">
+        <header className="mb-10 pt-10">
+          <div className="mb-5 flex items-center gap-3.5">
+            <span className="h-px w-11 bg-atelier-gold" />
+            <span className="font-codet text-xs tracking-[0.2em] text-atelier-muted">
+              {inboxContent.eyebrow}
+            </span>
+          </div>
+          <h1 className="m-0 font-serifd text-[clamp(34px,4.4vw,54px)] font-normal leading-[1.06] text-atelier-paper">
+            {inboxContent.heading}
+            <span className="italic text-atelier-gold">{inboxContent.headingAccent}</span>.
+          </h1>
+          <p className="m-0 mt-4 max-w-[520px] text-[15px] leading-[1.6] text-[#9D988E]">
+            {inboxContent.subhead}
+            {unread > 0 && (
+              <span className="ml-1.5 text-atelier-gold">
+                {unread} unread.
+              </span>
+            )}
+          </p>
+        </header>
+
+        {error && (
+          <p
+            className="mb-6 rounded-lg border px-4 py-3 text-[13px]"
+            style={{ borderColor: "rgba(224,122,95,0.4)", color: "#E07A5F" }}
+            role="alert"
+          >
+            {error}
+          </p>
+        )}
+
+        {loading ? (
+          <div className="flex flex-col gap-2">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="at-card h-24 shimmer" />
+            ))}
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="at-card px-6 py-12 text-center">
+            <p className="m-0 text-[15px] text-atelier-paper">{inboxContent.empty}</p>
+            <p className="mx-auto mt-2 max-w-md text-[13px] leading-relaxed text-atelier-faint">
+              {inboxContent.emptyBody}
+            </p>
+          </div>
+        ) : (
+          <ul className="m-0 flex list-none flex-col gap-2 p-0">
+            {messages.map((msg, i) => (
+              <li key={msg._id || i} className="at-card p-5">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <span className="text-[15px] font-medium text-atelier-paper">
+                    {msg.name || "Unknown"}
+                  </span>
+                  {!msg.hasViewed && (
+                    <span className="rounded-full bg-atelier-gold/[0.16] px-2 py-0.5 font-codet text-[10px] tracking-[0.06em] text-atelier-gold">
+                      {inboxContent.unreadLabel.toUpperCase()}
+                    </span>
+                  )}
+                  <span className="font-codet text-[11px] text-atelier-faint">
+                    {relative(msg.createdAt)}
+                  </span>
+                </div>
+
+                <p className="m-0 mt-2.5 whitespace-pre-wrap break-words text-[15px] leading-relaxed text-[#9D988E]">
+                  {msg.content}
+                </p>
+
+                {msg.email && (
+                  <a
+                    href={`mailto:${msg.email}`}
+                    className="mt-3 inline-block font-codet text-[11px] text-atelier-faint transition-colors hover:text-atelier-gold"
+                  >
+                    {msg.email}
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </main>
+  );
+}
+
+export default function InboxPage() {
   return (
     <ProtectedRoute>
-      <motion.section
-        className="min-h-screen flex flex-col items-center justify-start bg-gradient-to-br from-brand-navy via-brand-navy-mid to-brand-navy-light px-4 pt-24 pb-16"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-      >
-        <motion.h1
-          className="text-4xl font-bold text-yellow-400 mb-8 mt-4 drop-shadow-lg"
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.7, type: "spring" }}
-        >
-          Inbox
-        </motion.h1>
-        <div className="w-full max-w-2xl flex flex-col gap-6">
-          {loading ? (
-            [...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white/10 rounded-xl p-6 flex gap-4 items-center shadow-lg shimmer">
-                <div className="w-12 h-12 rounded-full bg-yellow-400/20 shimmer" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-5 w-1/2 bg-yellow-400/20 rounded shimmer" />
-                  <div className="h-4 w-3/4 bg-white/20 rounded shimmer" />
-                </div>
-              </div>
-            ))
-          ) : messages.length === 0 ? (
-            <div className="text-center py-12 text-white/80">No messages yet.</div>
-          ) : (
-            messages.map((msg, i) => (
-              <motion.article
-                key={msg._id || i}
-                className="bg-white/10 rounded-xl p-6 flex gap-4 items-start shadow-lg hover:shadow-2xl transition-shadow duration-200 group border border-white/5"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.05 * i, duration: 0.5, type: "spring" }}
-                whileHover={{ scale: 1.01, boxShadow: `0 0 32px 0 ${yellow}33` }}
-              >
-                <div className="w-12 h-12 rounded-full bg-yellow-400 flex items-center justify-center text-black font-bold text-xl shadow-lg shrink-0">
-                  {msg.name ? msg.name[0].toUpperCase() : "?"}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-bold text-yellow-300 text-lg mb-1">{msg.name || "Unknown"}</div>
-                  <p className="text-white/90 text-base mb-2 whitespace-pre-wrap break-words">{msg.content}</p>
-                  <div className="text-xs text-white/50">{msg.email}</div>
-                </div>
-              </motion.article>
-            ))
-          )}
-        </div>
-      </motion.section>
+      <InboxView />
     </ProtectedRoute>
   );
 }

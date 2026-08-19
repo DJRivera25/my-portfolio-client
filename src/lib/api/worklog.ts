@@ -1,10 +1,8 @@
 import api from "./client";
 import type {
-  PublicEntry,
   ReportDigest,
   WorkEntry,
   WorkEntryStatus,
-  WorkEntryVisibility,
   WorkProjectSummary,
   WorkSessionSummary,
 } from "../../types/worklog";
@@ -54,19 +52,5 @@ export async function updateEntryStatus(
   blockedReason?: string
 ): Promise<WorkEntry> {
   const res = await api.patch<WorkEntry>("/api/worklog/entries", { ref, status, blockedReason });
-  return res.data;
-}
-
-export async function updateEntryVisibility(
-  ref: number,
-  visibility: WorkEntryVisibility
-): Promise<WorkEntry> {
-  const res = await api.patch<WorkEntry>("/api/worklog/entries", { ref, visibility });
-  return res.data;
-}
-
-/** Unauthenticated — used by the public Build Log section. */
-export async function fetchPublicEntries(limit = 12): Promise<PublicEntry[]> {
-  const res = await api.get<PublicEntry[]>(`/api/worklog/public?limit=${limit}`);
   return res.data;
 }

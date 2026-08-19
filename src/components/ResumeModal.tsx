@@ -52,12 +52,12 @@ const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose, onSaved }) =
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="rounded-lg border border-hairline-strong bg-surface-glass px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white transition hover:border-accent-cyan hover:text-accent-cyan"
+            className="at-btn-ghost"
           >
             {previewName ? "Change file" : "Upload PDF"}
           </button>
           {previewName && (
-            <p className="truncate text-sm text-white/70 max-w-xs" title={previewName}>
+            <p className="truncate text-sm text-atelier-muted max-w-xs" title={previewName}>
               {previewName}
             </p>
           )}
@@ -73,11 +73,11 @@ const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose, onSaved }) =
         <button
           type="submit"
           disabled={loading || !resumeFile}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-bold uppercase tracking-wide text-brand-navy shadow-brand-glow transition hover:bg-accent-hover disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="at-btn w-full"
         >
           {loading ? (
             <>
-              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" />
+              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               Uploading…
             </>
           ) : (

@@ -59,7 +59,7 @@ export default function GetInTouchModal({ isOpen, onClose }: GetInTouchModalProp
             role="dialog"
             aria-modal="true"
             aria-labelledby="get-in-touch-title"
-            className="relative z-10 flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl border border-hairline-strong bg-brand-navy shadow-glass-lift sm:max-h-[85dvh] sm:rounded-2xl"
+            className="relative z-10 flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl border border-white/[0.12] bg-atelier-ink shadow-glass-lift sm:max-h-[85dvh] sm:rounded-2xl"
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 24, opacity: 0 }}
@@ -75,17 +75,17 @@ export default function GetInTouchModal({ isOpen, onClose }: GetInTouchModalProp
               }}
             />
 
-            <div className="relative z-10 flex shrink-0 items-center justify-between border-b border-hairline px-5 py-4">
+            <div className="relative z-10 flex shrink-0 items-center justify-between border-b border-white/[0.1] px-5 py-4">
               <div className="flex flex-col gap-1">
-                <span className="text-eyebrow uppercase text-accent-cyan">{contactSectionContent.eyebrow}</span>
-                <h2 id="get-in-touch-title" className="text-lg font-bold text-white">
+                <span className="font-codet text-[11px] tracking-[0.16em] uppercase text-atelier-gold">{contactSectionContent.eyebrow}</span>
+                <h2 id="get-in-touch-title" className="text-lg font-bold text-atelier-paper">
                   {contactSectionContent.heading}
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-full border border-hairline-strong bg-surface-glass p-1.5 text-white/70 backdrop-blur-glass transition hover:border-accent-cyan hover:text-accent-cyan"
+                className="rounded-full border border-white/[0.12] bg-white/[0.04] p-1.5 text-atelier-muted backdrop-blur-glass transition hover:border-atelier-gold hover:text-atelier-gold"
                 aria-label="Close"
               >
                 <X size={18} />
@@ -93,21 +93,21 @@ export default function GetInTouchModal({ isOpen, onClose }: GetInTouchModalProp
             </div>
 
             <div className="relative z-10 min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-6 pt-4">
-              <p className="mb-5 text-sm leading-relaxed text-white/75">{contactSectionContent.subhead}</p>
+              <p className="mb-5 text-sm leading-relaxed text-atelier-paper/75">{contactSectionContent.subhead}</p>
 
-              <div className="mb-6 flex flex-col gap-2 text-sm text-white/85">
+              <div className="mb-6 flex flex-col gap-2 text-sm text-atelier-paper/85">
                 <a
                   href={`mailto:${siteConfig.contact.email}`}
-                  className="inline-flex items-center gap-2 break-all transition hover:text-accent-cyan"
+                  className="inline-flex items-center gap-2 break-all transition hover:text-atelier-gold"
                 >
-                  <Mail className="h-4 w-4 shrink-0 text-accent-cyan" aria-hidden />
+                  <Mail className="h-4 w-4 shrink-0 text-atelier-gold" aria-hidden />
                   {siteConfig.contact.email}
                 </a>
                 <a
                   href={siteConfig.contact.phoneHref}
-                  className="inline-flex items-center gap-2 transition hover:text-accent-cyan"
+                  className="inline-flex items-center gap-2 transition hover:text-atelier-gold"
                 >
-                  <Phone className="h-4 w-4 shrink-0 text-accent-cyan" aria-hidden />
+                  <Phone className="h-4 w-4 shrink-0 text-atelier-gold" aria-hidden />
                   {siteConfig.contact.phone}
                 </a>
               </div>

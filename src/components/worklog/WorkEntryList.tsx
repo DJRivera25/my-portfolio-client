@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { Check, ChevronDown } from "lucide-react";
 import { STATUS_META, STATUS_ORDER, worklogContent } from "../../config/worklog";
 import type { WorkEntry, WorkEntryStatus } from "../../types/worklog";
 
@@ -8,7 +10,6 @@ interface Props {
   entries: WorkEntry[];
   busyRef: number | null;
   onStatusChange: (ref: number, status: WorkEntryStatus) => void;
-  onVisibilityToggle: (entry: WorkEntry) => void;
 }
 
 function relative(iso: string): string {
@@ -21,7 +22,7 @@ function relative(iso: string): string {
   return days < 30 ? `${days}d ago` : new Date(iso).toLocaleDateString();
 }
 
-const WorkEntryList: React.FC<Props> = ({ entries, busyRef, onStatusChange, onVisibilityToggle }) => {
+const WorkEntryList: React.FC<Props> = ({ entries, busyRef, onStatusChange }) => {
   if (!entries.length) {
     return (
       <div className="rounded-xl border border-white/[0.09] bg-white/[0.02] px-6 py-12 text-center">
@@ -38,7 +39,6 @@ const WorkEntryList: React.FC<Props> = ({ entries, busyRef, onStatusChange, onVi
       {entries.map((entry) => {
         const meta = STATUS_META[entry.status];
         const busy = busyRef === entry.ref;
-        const isPublic = entry.visibility === "public";
 
         return (
           <li
@@ -101,33 +101,45 @@ const WorkEntryList: React.FC<Props> = ({ entries, busyRef, onStatusChange, onVi
               </div>
 
               <div className="flex shrink-0 items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => onVisibilityToggle(entry)}
-                  disabled={busy}
-                  title={worklogContent.publishHint}
-                  className={`rounded-md border px-2.5 py-1.5 font-codet text-[10px] tracking-[0.06em] transition-colors ${
-                    isPublic
-                      ? "border-atelier-gold/55 text-atelier-gold"
-                      : "border-white/12 text-atelier-faint hover:border-white/25"
-                  }`}
-                >
-                  {isPublic ? "PUBLIC" : "PRIVATE"}
-                </button>
+                <Menu as="div" className="relative">
+                  <MenuButton
+                    disabled={busy}
+                    aria-label={`Status for entry ${entry.ref}`}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-white/[0.12] px-2.5 py-1.5 font-codet text-[10px] tracking-[0.06em] transition-colors hover:border-white/25 disabled:opacity-50"
+                    style={{ color: meta.color }}
+                  >
+                    {meta.label.toUpperCase()}
+                    <ChevronDown size={12} aria-hidden />
+                  </MenuButton>
 
-                <select
-                  value={entry.status}
-                  disabled={busy}
-                  onChange={(e) => onStatusChange(entry.ref, e.target.value as WorkEntryStatus)}
-                  aria-label={`Status for entry ${entry.ref}`}
-                  className="rounded-md border border-white/12 bg-atelier-ink px-2 py-1.5 font-codet text-[11px] text-atelier-paper outline-none focus:border-atelier-gold/55"
-                >
-                  {STATUS_ORDER.map((s) => (
-                    <option key={s} value={s}>
-                      {STATUS_META[s].label}
-                    </option>
-                  ))}
-                </select>
+                  <MenuItems
+                    anchor="bottom end"
+                    className="z-[60] mt-1.5 w-[168px] overflow-hidden rounded-lg border border-white/[0.12] p-1 shadow-atelier-card focus:outline-none"
+                    style={{ background: "linear-gradient(180deg,#161618,#101012)" }}
+                  >
+                    {STATUS_ORDER.map((s) => {
+                      const active = s === entry.status;
+                      return (
+                        <MenuItem key={s}>
+                          <button
+                            type="button"
+                            onClick={() => onStatusChange(entry.ref, s)}
+                            className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left font-codet text-[11px] transition-colors data-[focus]:bg-white/[0.06]"
+                            style={{ color: active ? STATUS_META[s].color : "#A39F96" }}
+                          >
+                            <span
+                              className="h-1.5 w-1.5 shrink-0 rounded-full"
+                              style={{ background: STATUS_META[s].color }}
+                              aria-hidden
+                            />
+                            <span className="flex-1">{STATUS_META[s].label}</span>
+                            {active && <Check size={13} aria-hidden />}
+                          </button>
+                        </MenuItem>
+                      );
+                    })}
+                  </MenuItems>
+                </Menu>
               </div>
             </div>
           </li>

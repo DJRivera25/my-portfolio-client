@@ -1,5 +1,4 @@
 import { defineConfig } from "vitest/config";
-import path from "path";
 
 export default defineConfig({
   test: {
@@ -7,6 +6,7 @@ export default defineConfig({
     include: ["lib/**/*.test.ts"],
   },
   resolve: {
-    alias: { "@": path.resolve(__dirname) },
+    // import.meta.dirname, not __dirname — this file is ESM (.mts).
+    alias: { "@": import.meta.dirname },
   },
 });
