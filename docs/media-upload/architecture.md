@@ -16,7 +16,23 @@ transformation: [{ width: 800, crop: "limit" }]
 `crop: "limit"` only shrinks — an image narrower than 800px is left alone. Returns the full
 `UploadApiResponse`; callers use `.secure_url`.
 
-This is what `POST /api/projects` uses for both `image` and `mobileImage`.
+This is what `POST /api/projects` uses for both `image` and `mobileImage`, and what
+`POST /api/projects/screenshot` uses to store a captured homepage.
+
+`isPortfolioImageUrl(value)` in the same file accepts only https URLs on `res.cloudinary.com`. The
+project routes use it to accept a captured screenshot's URL as `image` without re-uploading.
+
+### Captured screenshots — `lib/screenshot.ts`
+
+[`lib/screenshot.ts`](../../lib/screenshot.ts) is the screenshot provider adapter (Microlink).
+`captureScreenshot(link)` asks the provider for a 1440×900, device-scale-1 JPEG of the page,
+downloads it, and returns the bytes; `uploadImageToPortfolio` then caps it at 800px wide.
+
+The provider is named only in that file and in `MICROLINK_API_KEY`. Without the key, requests go
+to the free endpoint (5 captures a day, per the provider's docs); with it, to `pro.microlink.io`
+with an `x-api-key` header (a free account key allows 25 a day). Failures throw
+`ScreenshotError` with a `reason` — `rate_limited`, `site_failed` or `provider_failed` — that the
+route maps to `429` / `422` / `502`.
 
 ### 2. `POST /api/upload` — the generic route
 

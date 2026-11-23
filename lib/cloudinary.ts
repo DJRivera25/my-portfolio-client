@@ -24,4 +24,13 @@ export async function uploadImageToPortfolio(buffer: Buffer): Promise<UploadApiR
   });
 }
 
+export function isPortfolioImageUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && url.hostname === "res.cloudinary.com";
+  } catch {
+    return false;
+  }
+}
+
 export default cloudinary;

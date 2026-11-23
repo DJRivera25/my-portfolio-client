@@ -11,7 +11,8 @@ Cloudinary uploads for project and resume assets. Everything lands in the `portf
 
 ## What this domain owns
 
-`lib/cloudinary.ts` and `app/api/upload/**`.
+`lib/cloudinary.ts`, `lib/screenshot.ts` (the screenshot provider adapter), their tests, and
+`app/api/upload/**`.
 
 Project and resume handlers in [portfolio-content](../portfolio-content/README.md) also upload —
 they import from here rather than re-configuring Cloudinary.
@@ -22,6 +23,9 @@ they import from here rather than re-configuring Cloudinary.
 
 All three are read at module scope in `lib/cloudinary.ts` via `cloudinary.config(...)`. Unset
 values do not throw at import — the failure surfaces as an upload rejection at request time.
+
+`MICROLINK_API_KEY` is optional, read per request in `lib/screenshot.ts`. Unset, captures use the
+provider's anonymous allowance.
 
 ## Related domains
 

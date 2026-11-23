@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
-import api from "../lib/api/client";
+import api, { isAxiosError } from "../lib/api/client";
 import { toast } from "react-toastify";
 import ModalFrame from "./ui/ModalFrame";
 import type { Project } from "../types/portfolio";
@@ -30,6 +30,8 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
   const [tagDraft, setTagDraft] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [capturing, setCapturing] = useState(false);
   const [mobileImageFile, setMobileImageFile] = useState<File | null>(null);
   const [mobilePreview, setMobilePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -51,6 +53,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
       setHighlightDraft("");
       setTags(initialData.tags ?? []);
       setPreview(initialData.image);
+      setCapturedImage(null);
       setMobilePreview(initialData.mobileImage ?? null);
       setImageFile(null);
       setMobileImageFile(null);
@@ -71,6 +74,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
       setTagDraft("");
       setImageFile(null);
       setPreview(null);
+      setCapturedImage(null);
       setMobileImageFile(null);
       setMobilePreview(null);
     }
@@ -80,7 +84,25 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
     const file = e.target.files?.[0];
     if (file) {
       setImageFile(file);
+      setCapturedImage(null);
       setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleCapture = async () => {
+    if (!link.trim() || capturing) return;
+    setCapturing(true);
+    try {
+      const { data } = await api.post<{ url: string }>("/api/projects/screenshot", { link: link.trim() });
+      setCapturedImage(data.url);
+      setImageFile(null);
+      setPreview(data.url);
+      toast.success("Screenshot captured. Check it before saving.");
+    } catch (error) {
+      const message = isAxiosError(error) ? (error.response?.data as { message?: unknown } | undefined)?.message : null;
+      toast.error(typeof message === "string" ? message : "Couldn't capture the site. Upload an image instead.");
+    } finally {
+      setCapturing(false);
     }
   };
 
@@ -150,6 +172,10 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!initialData && !imageFile && !capturedImage) {
+      toast.error("Add a desktop screenshot: upload one or capture it from the link.");
+      return;
+    }
     setLoading(true);
     try {
       const formData = new FormData();
@@ -167,6 +193,8 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
       formData.append("solution", solution);
       if (imageFile) {
         formData.append("image", imageFile);
+      } else if (capturedImage) {
+        formData.append("image", capturedImage);
       }
       if (mobileImageFile) {
         formData.append("mobileImage", mobileImageFile);
@@ -348,6 +376,16 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSaved, i
             inputRef={fileInputRef}
             onChange={handleFileChange}
             ratio="aspect-[16/10]"
+            action={
+              <button
+                type="button"
+                onClick={handleCapture}
+                disabled={!link.trim() || capturing}
+                className="mt-2 w-full rounded-md border border-white/[0.12] bg-white/[0.03] px-3 py-1.5 text-xs text-atelier-paper/70 transition hover:border-atelier-gold hover:text-atelier-gold disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {capturing ? "Capturing… (up to 30s)" : "Capture from link"}
+              </button>
+            }
           />
           <ImageInput
             label="Mobile screenshot (optional)"
@@ -385,9 +423,10 @@ type ImageInputProps = {
   inputRef: React.MutableRefObject<HTMLInputElement | null>;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   ratio: string;
+  action?: React.ReactNode;
 };
 
-const ImageInput: React.FC<ImageInputProps> = ({ label, preview, inputRef, onChange, ratio }) => (
+const ImageInput: React.FC<ImageInputProps> = ({ label, preview, inputRef, onChange, ratio, action }) => (
   <div className="rounded-lg border border-white/[0.12] bg-white/[0.04] p-3">
     <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-atelier-muted">{label}</p>
     <button
@@ -403,6 +442,7 @@ const ImageInput: React.FC<ImageInputProps> = ({ label, preview, inputRef, onCha
       )}
     </button>
     <input type="file" ref={inputRef} onChange={onChange} accept="image/*" className="hidden" />
+    {action}
   </div>
 );
 

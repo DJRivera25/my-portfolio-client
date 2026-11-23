@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Project from "@/lib/models/Project";
-import { uploadImageToPortfolio } from "@/lib/cloudinary";
+import { isPortfolioImageUrl, uploadImageToPortfolio } from "@/lib/cloudinary";
 import { isAuthorizedAdmin, unauthorizedResponse } from "@/lib/auth";
 
 export const runtime = "nodejs";
@@ -29,7 +29,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "Title, description, link, and image are required" }, { status: 400 });
   }
 
-  const upload = await uploadImageToPortfolio(Buffer.from(await (file as Blob).arrayBuffer()));
+  let image: string;
+  if (typeof file === "string") {
+    if (!isPortfolioImageUrl(file)) {
+      return NextResponse.json({ message: "Image must be an uploaded file or a captured screenshot" }, { status: 400 });
+    }
+    image = file;
+  } else {
+    image = (await uploadImageToPortfolio(Buffer.from(await file.arrayBuffer()))).secure_url;
+  }
 
   let mobileUrl: string | undefined;
   if (mobileFile && mobileFile instanceof Blob && mobileFile.size > 0) {
@@ -52,7 +60,7 @@ export async function POST(req: Request) {
     title: String(title),
     description: String(description),
     link: String(link),
-    image: upload.secure_url,
+    image,
     mobileImage: mobileUrl,
     tags,
     year: Number.isFinite(year) ? year : undefined,

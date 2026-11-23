@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Project from "@/lib/models/Project";
-import { uploadImageToPortfolio } from "@/lib/cloudinary";
+import { isPortfolioImageUrl, uploadImageToPortfolio } from "@/lib/cloudinary";
 import { isAuthorizedAdmin, unauthorizedResponse } from "@/lib/auth";
 
 export const runtime = "nodejs";
@@ -55,7 +55,12 @@ export async function PUT(req: NextRequest, props: { params: Promise<{ id: strin
     if (tagsRaw !== null) {
       project.tags = parseTags(tagsRaw);
     }
-    if (file && file instanceof Blob && file.size > 0) {
+    if (typeof file === "string" && file) {
+      if (!isPortfolioImageUrl(file)) {
+        return NextResponse.json({ message: "Image must be an uploaded file or a captured screenshot" }, { status: 400 });
+      }
+      project.image = file;
+    } else if (file && file instanceof Blob && file.size > 0) {
       const upload = await uploadImageToPortfolio(Buffer.from(await file.arrayBuffer()));
       project.image = upload.secure_url;
     }

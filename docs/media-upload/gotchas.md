@@ -11,6 +11,21 @@ orphaned asset back to the project that created it means comparing URLs by hand.
 
 Storing `upload.public_id` alongside `image` would make deletion possible — the model does not.
 
+## A captured screenshot is uploaded before the project is saved
+
+`POST /api/projects/screenshot` stores the capture in Cloudinary immediately, so the admin form
+can preview it. Pressing "Capture from link" twice, or closing the form without saving, leaves the
+earlier captures in the `portfolio` folder with nothing pointing at them — the same orphan problem
+as above, created faster.
+
+## The free screenshot allowance is tiny
+
+Without `MICROLINK_API_KEY`, the provider's docs give the anonymous endpoint 5 captures a day, and
+at most 2 at once per IP address. Whether the daily count is per IP is not documented — on Vercel,
+outbound IPs are shared, so the allowance may already be spent by others. A `429` from the capture
+route with "allowance is used up" means set the key (a free account allows 25 a day) or upload
+manually.
+
 ## The two upload paths apply different policies
 
 Same folder, different behaviour:

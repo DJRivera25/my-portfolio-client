@@ -248,6 +248,9 @@ otherwise `doc-sync` reports the files as orphans.
       "lastVerified": "2026-08-19",
       "paths": [
         "lib/cloudinary.ts",
+        "lib/cloudinary.test.ts",
+        "lib/screenshot.ts",
+        "lib/screenshot.test.ts",
         "app/api/upload/**"
       ]
     },
