@@ -15,7 +15,7 @@
 | `AboutSection.tsx` | `aboutContent` |
 | `StackSection.tsx` | `stackGroups` — static, not the `Tool` collection |
 | `HowIShip.tsx` | `processStages` / `processContent` |
-| `ResumeSection.tsx` | Resume from `/api/resumes`, PDF in `public/atelier/` |
+| `ResumeSection.tsx` | `resumeContent`, plus a client-built PDF download (html2canvas → jsPDF) |
 | `ContactSection.tsx` | The live contact form via `useContactFormSubmission` |
 | `SiteFooter.tsx` | `footerContent` plus merged socials |
 | `CommandPalette.tsx` | Keyboard navigation overlay |
@@ -42,8 +42,8 @@ them.
 `Derem-Joshua-Rivera-Resume.pdf`, `about-image.png`, `portrait-duotone.png`, `my-photo.png`,
 `mockup.png`, project shots (`ecommerce.png`, `tiket-lakwatsero.png`), and a `logos/` folder.
 
-The resume PDF here is the static baseline; `ResumeSection` prefers a `Resume` row from the API
-when one exists.
+The resume PDF here is not served by the homepage. `resumeContent.fallbackPdf` points at it, but
+nothing reads that field — `ResumeSection` takes no props and never calls `/api/resumes`.
 
 ## Styling
 

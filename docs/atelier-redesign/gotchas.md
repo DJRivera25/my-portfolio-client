@@ -38,11 +38,21 @@ platform with no row still renders with its default URL — so a "missing" socia
 `defaultSocials` entry, not an empty state. Two DB rows for the same platform: the first wins,
 silently.
 
-## The resume has two possible sources
+## The downloaded resume is built in the browser from `resumeContent`
 
-`public/atelier/Derem-Joshua-Rivera-Resume.pdf` is the static baseline; a `Resume` row from
-`/api/resumes` supersedes it. If a resume update does not show, check which source is winning
-before re-uploading.
+`ResumeSection` screenshots each `.pdf-block` with html2canvas and packs the images into a jsPDF
+document. Edit `resumeContent` in `src/config/atelier.ts` to change it — the `Resume` collection,
+`/api/resumes`, and `public/atelier/Derem-Joshua-Rivera-Resume.pdf` play no part.
+
+The PDF is images only, with no text layer, so a recruiter's applicant-tracking system cannot read
+it without OCR.
+
+## jsPDF stores PNGs uncompressed unless you pass a compression level
+
+`addImage` with no compression argument resolves to `"NONE"` (`checkCompressValue` in jsPDF 4.2.1)
+and writes raw RGB — the resume came out at 15.6 MB. Passing `"FAST"` with `compress: true` on the
+document brings the same pixels to about 0.6 MB, losslessly. Keep the argument on any new
+`addImage` call.
 
 ## Keyframes live in another domain's file
 

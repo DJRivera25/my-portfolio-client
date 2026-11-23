@@ -44,7 +44,7 @@ const ResumeSection: React.FC = () => {
       if (document.fonts?.ready) await document.fonts.ready;
       await new Promise((resolve) => setTimeout(resolve, 80));
 
-      const pdf = new jsPDF({ unit: "pt", format, orientation: "portrait" });
+      const pdf = new jsPDF({ unit: "pt", format, orientation: "portrait", compress: true });
       const pageW = pdf.internal.pageSize.getWidth();
       const pageH = pdf.internal.pageSize.getHeight();
       const margin = format === "a4" ? 40 : 42; // ~0.55in
@@ -94,7 +94,8 @@ const ResumeSection: React.FC = () => {
           const need = it.h + gap + Math.min(items[i + 1].h, 48);
           if (y + need > bottomY) startPage();
         }
-        pdf.addImage(it.url, "PNG", margin, y, contentW, it.h);
+        // jsPDF stores PNGs as raw pixels unless told otherwise (~16 MB here); lossless FAST is ~0.6 MB
+        pdf.addImage(it.url, "PNG", margin, y, contentW, it.h, undefined, "FAST");
         y += it.h + gap;
       }
 
