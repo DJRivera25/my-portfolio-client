@@ -67,7 +67,9 @@ alias:       { "@": <repo root> }
 ```
 
 Node environment, so no jsdom and no component tests. The include glob covers `lib/` only — a test
-anywhere else is silently not run.
+anywhere else is silently not run. The worklog hook helpers are the exception by design: `.mjs` files
+under `scripts/worklog-hooks/`, run with `npm run test:hooks` (`node --test`), separate from `npm test`
+([`package.json`](../../package.json)).
 
 ## Ambient types — [src/images.d.ts](../../src/images.d.ts)
 

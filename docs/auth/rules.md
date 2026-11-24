@@ -12,12 +12,12 @@ this line is public to the internet.
 Public by design, and only these: `GET` on `/api/projects`, `/api/tools`, `/api/socials`,
 `/api/resumes` (the portfolio reads them unauthenticated), and `POST /api/auth/login`.
 
-Still open and **should not be**: all four methods on `/api/users`, and `POST /api/upload`.
+`/api/users` (all four methods) and `POST /api/upload` are now admin-gated. If you add a route like them, start it with the check.
 
 ## Never return a password hash
 
 Any handler returning `User` documents must `.select("-password")` or project explicitly.
-`GET /api/users` currently violates this. The fix is both parts together:
+`GET /api/users` does this today (`SAFE_FIELDS = "-password"`). The pattern, both parts together:
 
 ```ts
 if (!isAuthorizedAdmin(req)) return unauthorizedResponse();
@@ -25,9 +25,9 @@ await dbConnect();
 const users = await User.find().select("-password");
 ```
 
-## `MCP_TOKEN` gets no default, ever
+## `MCP_TOKEN` and `MCP_CLAUDE_AI_TOKEN` get no default, ever
 
-`isAuthorizedMcp` denies when the env var is unset. Do not "harmonize" it with
+`mcpClientFor` denies a client whose env var is unset; keep the two tokens separate values so either client can be revoked alone. Do not "harmonize" it with
 `isAuthorizedAdmin` by adding a fallback — the fallback on the admin side is the bug, not the
 pattern to copy.
 

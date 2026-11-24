@@ -38,6 +38,7 @@
     "start": "next start",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:hooks": "node --test scripts/worklog-hooks/worklog-hook-lib.test.mjs",
     "type-check": "tsc --noEmit"
   },
   "eslintConfig": {

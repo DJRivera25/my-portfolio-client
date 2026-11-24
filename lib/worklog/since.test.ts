@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseSince } from "./since";
+import { parseSince, parseUntil } from "./since";
 
 const now = new Date("2026-08-18T12:00:00.000Z");
 
@@ -26,4 +26,15 @@ describe("parseSince", () => {
   it("returns undefined for unparseable input rather than throwing", () => {
     expect(parseSince("last tuesday-ish", now)).toBeUndefined();
   });
+});
+
+describe("parseUntil", () => {
+  const now = new Date("2026-11-24T12:00:00Z");
+  it("makes a bare date inclusive by returning the next midnight", () =>
+    expect(parseUntil("2026-11-20", now)).toEqual(new Date("2026-11-21T00:00:00.000Z")));
+  it("keeps a full timestamp as given", () =>
+    expect(parseUntil("2026-11-20T15:00:00Z", now)).toEqual(new Date("2026-11-20T15:00:00Z")));
+  it("reads relative windows like parseSince", () =>
+    expect(parseUntil("7d", now)).toEqual(new Date("2026-11-17T12:00:00Z")));
+  it("returns undefined for blank input", () => expect(parseUntil("", now)).toBeUndefined());
 });

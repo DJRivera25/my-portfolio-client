@@ -2,71 +2,42 @@ import {
   OPEN_STATUSES,
   WORK_ENTRY_STATUSES,
   type ReportBlocker,
+  type ReportCountRow,
   type ReportDigest,
   type ReportProjectLine,
-  type WorkEntryLike,
   type WorkEntryStatus,
 } from "./types";
 
-function toDate(value: Date | string): Date {
-  return value instanceof Date ? value : new Date(value);
-}
-
-function projectOf(project: unknown): { name: string; slug: string } {
-  if (project && typeof project === "object") {
-    const record = project as Record<string, unknown>;
-    const slug = typeof record.slug === "string" ? record.slug : "unassigned";
-    const name = typeof record.name === "string" ? record.name : slug;
-    return { name, slug };
-  }
-  return { name: "Unassigned", slug: "unassigned" };
-}
-
-export function aggregateReport(
-  entries: WorkEntryLike[],
+export function reportFromCounts(
+  rows: ReportCountRow[],
+  blockers: ReportBlocker[],
   opts: { since?: Date } = {}
 ): ReportDigest {
-  const since = opts.since ?? null;
-  const scoped = since
-    ? entries.filter((e) => toDate(e.createdAt).getTime() >= since.getTime())
-    : entries;
-
   const byStatus = Object.fromEntries(
     WORK_ENTRY_STATUSES.map((s) => [s, 0])
   ) as Record<WorkEntryStatus, number>;
-
   const projects = new Map<string, ReportProjectLine>();
-  const blockers: ReportBlocker[] = [];
+  let total = 0;
   let minutesSpent = 0;
 
-  for (const entry of scoped) {
-    byStatus[entry.status] = (byStatus[entry.status] ?? 0) + 1;
+  for (const r of rows) {
+    total += r.count;
+    minutesSpent += r.minutesSpent;
+    byStatus[r.status] = (byStatus[r.status] ?? 0) + r.count;
 
-    const minutes = entry.minutesSpent ?? 0;
-    minutesSpent += minutes;
-
-    const { name, slug } = projectOf(entry.project);
+    const { name, slug } = r.project;
     const line =
       projects.get(slug) ?? { slug, name, total: 0, done: 0, open: 0, minutesSpent: 0 };
-    line.total += 1;
-    if (entry.status === "done") line.done += 1;
-    if (OPEN_STATUSES.includes(entry.status)) line.open += 1;
-    line.minutesSpent += minutes;
+    line.total += r.count;
+    if (r.status === "done") line.done += r.count;
+    if (OPEN_STATUSES.includes(r.status)) line.open += r.count;
+    line.minutesSpent += r.minutesSpent;
     projects.set(slug, line);
-
-    if (entry.status === "blocked") {
-      blockers.push({
-        ref: entry.ref,
-        title: entry.title,
-        project: name,
-        reason: entry.blockedReason ?? null,
-      });
-    }
   }
 
   return {
-    total: scoped.length,
-    since: since ? since.toISOString() : null,
+    total,
+    since: opts.since ? opts.since.toISOString() : null,
     minutesSpent,
     byStatus,
     byProject: [...projects.values()].sort(

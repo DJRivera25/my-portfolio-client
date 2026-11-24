@@ -5,19 +5,20 @@ import { listAttachments } from "./attachmentQueries";
 import { listWorkGroups } from "./groups";
 
 /**
- * Everything the dashboard needs, in one round trip.
+ * Everything the dashboard needs for its first paint, in one round trip.
  *
  * The dashboard previously issued four requests and re-issued all four whenever a
  * filter changed — including projects and sessions, which no filter affects. Against
  * serverless functions that read as lag: the card highlights instantly (local state)
  * while its content waits on the network.
  *
- * Now the client fetches this once and does its filtering and report aggregation in
- * memory, so changing a filter costs nothing. The per-resource routes remain for the
- * MCP adapter and for anything that wants one slice.
+ * Now the client fetches this once for its first paint. Entries come back as the first
+ * page plus `entryTotal`; each filter change and Load more asks `/api/worklog/entries`,
+ * and the report comes from `/api/worklog/report`, so nothing older than the first page
+ * is silently missing.
  */
 export async function getDashboard(entryLimit = 300) {
-  const [projects, entries, sessions, attachments, groups] = await Promise.all([
+  const [projects, entryPage, sessions, attachments, groups] = await Promise.all([
     listWorkProjects(),
     listWorkEntries({ limit: entryLimit }),
     getSessionStatus(),
@@ -25,5 +26,5 @@ export async function getDashboard(entryLimit = 300) {
     listWorkGroups(),
   ]);
 
-  return { projects, entries, sessions, attachments, groups };
+  return { projects, entries: entryPage.entries, entryTotal: entryPage.total, sessions, attachments, groups };
 }

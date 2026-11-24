@@ -144,6 +144,12 @@ const WorkBoard: React.FC<Props> = ({ entries, attachmentsByEntry, busyRef, onSt
                         </p>
                       )}
 
+                      {entry.status !== "done" && entry.waitingOn && (
+                        <p className="m-0 mt-1.5 font-codet text-[10px] text-atelier-muted">
+                          {worklogContent.waitingOnPrefix} {entry.waitingOn}
+                        </p>
+                      )}
+
                       {entry.group && (
                         <span className="mt-2 inline-block rounded border border-atelier-gold/30 px-1.5 py-0.5 font-codet text-[10px] text-atelier-gold/90">
                           {entry.group}

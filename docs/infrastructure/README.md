@@ -22,7 +22,10 @@ There is **no `next.config.*`** in this repo.
 | `MONGODB_URI` | infrastructure | **Throws at module import** of `lib/db.ts` |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | [auth](../auth/README.md) | Login returns `500` |
 | `ADMIN_API_TOKEN` | [auth](../auth/README.md) | Falls back to `"admin-static-token"` |
-| `MCP_TOKEN` | [worklog](../worklog/README.md) | `/api/mcp` denies everything |
+| `MCP_TOKEN` | [worklog](../worklog/README.md) / [auth](../auth/README.md) | Claude Code is denied at `/api/mcp` (no default) |
+| `MCP_CLAUDE_AI_TOKEN` | [worklog](../worklog/README.md) / [auth](../auth/README.md) | claude.ai is denied at `/api/mcp` (no default) |
+| `MICROLINK_API_KEY` (optional) | [media-upload](../media-upload/README.md) | Screenshot capture uses the anonymous allowance (`lib/screenshot.ts`) |
+| `WORKLOG_HOOK_URL_OVERRIDE` (optional, not in `.env.example`) | [worklog](../worklog/README.md) | Read only by the session-start hook, never by the app; replaces the worklog URL for a dry run |
 | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | [media-upload](../media-upload/README.md) | Uploads fail at request time |
 | `EMAIL_USER`, `EMAIL_PASS`, `EMAIL_TO` | [messaging](../messaging/README.md) | `sendMail` throws; `EMAIL_TO` defaults to `EMAIL_USER` |
 | `NEXT_PUBLIC_SITE_URL` | infrastructure | `siteConfig.ogUrl` falls back to the Vercel URL |

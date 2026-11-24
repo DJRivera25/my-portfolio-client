@@ -26,3 +26,15 @@ export function parseSince(input?: string | null, now: Date = new Date()): Date 
   const parsed = new Date(trimmed);
   return Number.isNaN(parsed.getTime()) ? undefined : parsed;
 }
+
+const BARE_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Upper bound for a window. A bare date means "through that day", so it resolves to the next
+ * UTC midnight and callers treat the result as exclusive.
+ */
+export function parseUntil(input?: string | null, now: Date = new Date()): Date | undefined {
+  const parsed = parseSince(input, now);
+  if (!parsed || !input || !BARE_DATE.test(input.trim())) return parsed;
+  return new Date(parsed.getTime() + UNIT_MS.d);
+}
