@@ -227,7 +227,7 @@ const PortfolioPage: React.FC = () => {
         <SelectedWork />
         <AboutSection />
         <StackSection groups={groups} />
-        <HowIShip />
+        <HowIShip />
         <ResumeSection />
         <ContactSection socials={socials} />
         <SiteFooter />
