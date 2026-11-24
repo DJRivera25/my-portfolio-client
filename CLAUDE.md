@@ -211,6 +211,8 @@ otherwise `doc-sync` reports the files as orphans.
         "app/api/socials/**",
         "app/api/resume/**",
         "app/api/resumes/**",
+        "lib/embeddable.ts",
+        "lib/embeddable.test.ts",
         "src/components/ProjectModal.tsx",
         "src/types/portfolio.ts"
       ]

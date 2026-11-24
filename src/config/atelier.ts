@@ -398,6 +398,11 @@ export const footerContent = {
 } as const;
 
 /* ------------------------------------------------ PROJECT → CASE STUDY */
+export const caseStudyContent = {
+  livePreview: "LIVE PREVIEW",
+  loading: "Loading the live site…",
+  explore: "Explore the live site",
+} as const;
 
 /**
  * Curated running order for "The Build Log" — strongest, most recent client work first.

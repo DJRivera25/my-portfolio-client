@@ -57,6 +57,13 @@ written here are neither validated nor displayed today.
 Two rows for the same platform are allowed. `mergeSocials` in `PortfolioPage` matches
 case-insensitively and takes the first hit, so a duplicate is invisible rather than an error.
 
+## The embeddable answer is cached for a day
+
+`GET /api/projects/[id]/embeddable` is CDN-cached for 24 hours and served stale for up to a week
+while it refreshes. After changing a project's `link`, or after the site changes its framing
+headers, the live preview can keep its old answer for that long. In the browser, `PortfolioPage`
+also remembers the answer until the page is reloaded.
+
 ## Deleting a document does not delete the Cloudinary asset
 
 `DELETE` removes the Mongo document only. The uploaded image stays in the `portfolio` folder

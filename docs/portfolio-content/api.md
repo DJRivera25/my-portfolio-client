@@ -53,6 +53,24 @@ returned URL as `image` through `POST`/`PUT` above.
 
 Capture logic lives in `lib/screenshot.ts`, owned by [media-upload](../media-upload/README.md).
 
+### `GET /api/projects/[id]/embeddable`
+
+Public. Answers whether a browser on this site may show the project's `link` in an iframe; the
+case-study drawer's live preview asks before rendering one. Takes a project id, never a URL, so a
+visitor cannot point the server's fetch at an arbitrary address.
+
+| Status | Body |
+|---|---|
+| `200` | `{ embeddable: boolean }`, sent with `Cache-Control: public, s-maxage=86400, stale-while-revalidate=604800` |
+| `404 { message: "Project not found" }` | malformed id or no such project |
+| `500 { message: "Could not check the project" }` | the database lookup failed |
+
+`isEmbeddable` in [`lib/embeddable.ts`](../../lib/embeddable.ts) fetches the link (6s timeout,
+redirects followed) and reads the final response's `Content-Security-Policy` `frame-ancestors`,
+falling back to `X-Frame-Options`, the way browsers do. It is `false` for a non-2xx answer, a
+timeout, a non-http(s) link, or an http site when this site is served over https (mixed content).
+The embedding origin is the request's own (`req.nextUrl.origin`).
+
 ## `/api/tools`, `/api/socials`
 
 Same shape: public `GET`, admin `POST` / `PUT` / `DELETE` with JSON bodies, plus `[id]` routes

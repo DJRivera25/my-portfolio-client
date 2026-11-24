@@ -1,11 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { CaseStudy } from "../../types/portfolio";
+import { caseStudyContent } from "../../config/atelier";
 
 type Props = {
   cases: CaseStudy[];
   index: number;
+  embeddable: boolean;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
@@ -17,7 +19,93 @@ const CheckIcon = () => (
   </svg>
 );
 
-const CaseStudyDrawer: React.FC<Props> = ({ cases, index, onClose, onPrev, onNext }) => {
+// Desktop matches the captured screenshot's viewport; narrow drawers get the site's phone layout.
+const DESKTOP_VIEWPORT = { width: 1440, height: 900 };
+const PHONE_VIEWPORT = { width: 390, height: 720 };
+const PHONE_BELOW_PX = 600;
+
+const hostOf = (link: string) => {
+  try {
+    return new URL(link).host;
+  } catch {
+    return link;
+  }
+};
+
+const LivePreview: React.FC<{ link: string; title: string }> = ({ link, title }) => {
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [boxWidth, setBoxWidth] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+  const [interactive, setInteractive] = useState(false);
+
+  useEffect(() => {
+    const box = boxRef.current;
+    if (!box) return;
+    const observer = new ResizeObserver(([entry]) => setBoxWidth(entry.contentRect.width));
+    observer.observe(box);
+    return () => observer.disconnect();
+  }, []);
+
+  const viewport = boxWidth > 0 && boxWidth < PHONE_BELOW_PX ? PHONE_VIEWPORT : DESKTOP_VIEWPORT;
+
+  return (
+    <div className="mt-12">
+      <div className="mb-4 font-codet text-[11px] tracking-[0.16em] text-atelier-faint">
+        {caseStudyContent.livePreview}
+      </div>
+      <div className="overflow-hidden rounded-[10px] border border-white/10 bg-[#111113]">
+        <div className="flex items-center gap-2 border-b border-white/[0.08] px-4 py-2.5">
+          <span className="h-2 w-2 rounded-full bg-white/[0.16]" />
+          <span className="h-2 w-2 rounded-full bg-white/[0.16]" />
+          <span className="h-2 w-2 rounded-full bg-white/[0.16]" />
+          <span className="ml-2 truncate font-codet text-[11px] text-atelier-muted">{hostOf(link)}</span>
+        </div>
+        <div
+          ref={boxRef}
+          className="relative overflow-hidden bg-[#0C0C0E]"
+          style={{ aspectRatio: `${viewport.width} / ${viewport.height}` }}
+        >
+          {boxWidth > 0 && (
+            <iframe
+              src={link}
+              title={`${title} — live site`}
+              loading="lazy"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+              onLoad={() => setLoaded(true)}
+              className={`absolute left-0 top-0 origin-top-left border-0 bg-white transition-opacity duration-500 ${
+                loaded ? "opacity-100" : "opacity-0"
+              } ${interactive ? "" : "pointer-events-none"}`}
+              style={{
+                width: viewport.width,
+                height: viewport.height,
+                transform: `scale(${boxWidth / viewport.width})`,
+              }}
+            />
+          )}
+          {!loaded && (
+            <div className="absolute inset-0 flex items-center justify-center font-codet text-xs text-atelier-muted">
+              {caseStudyContent.loading}
+            </div>
+          )}
+          {/* Until clicked, scrolling over the preview scrolls the drawer instead of the embedded site. */}
+          {loaded && !interactive && (
+            <button
+              type="button"
+              onClick={() => setInteractive(true)}
+              className="group absolute inset-0 flex items-end justify-center bg-transparent pb-5"
+            >
+              <span className="rounded-full border border-white/[0.16] bg-[#0B0B0D]/80 px-4 py-2 font-codet text-[11px] text-atelier-paper backdrop-blur-[6px] transition group-hover:border-atelier-gold group-hover:text-atelier-gold">
+                {caseStudyContent.explore}
+              </span>
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const CaseStudyDrawer: React.FC<Props> = ({ cases, index, embeddable, onClose, onPrev, onNext }) => {
   const active = cases[index];
   if (!active) return null;
   const counter = String(index + 1).padStart(2, "0");
@@ -133,6 +221,8 @@ const CaseStudyDrawer: React.FC<Props> = ({ cases, index, onClose, onPrev, onNex
               ))}
             </div>
           </div>
+
+          {embeddable && <LivePreview key={active.id} link={active.link} title={active.title} />}
 
           <div className="mt-[52px] flex flex-wrap items-center justify-between gap-[18px] border-t border-white/[0.09] pt-8">
             <a

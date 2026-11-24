@@ -54,6 +54,19 @@ and writes raw RGB — the resume came out at 15.6 MB. Passing `"FAST"` with `co
 document brings the same pixels to about 0.6 MB, losslessly. Keep the argument on any new
 `addImage` call.
 
+## The live preview is the real site, popups and all
+
+The drawer's iframe loads the project's actual homepage, so its cookie banners, promo popups and
+slow loads show too (Maximum88 shows both). It also counts as a visit in that site's analytics.
+The sandbox omits `allow-top-navigation`, so a site's frame-busting script cannot navigate the
+portfolio away.
+
+## Keyboard shortcuts stop while the live preview has focus
+
+After "Explore the live site", clicks inside the iframe move focus into the embedded page, and its
+key presses go there. Esc and the arrow keys stop closing or paging the drawer until the visitor
+clicks back on the drawer.
+
 ## Keyframes live in another domain's file
 
 Every animation these components use is defined in `src/index.css`, owned by

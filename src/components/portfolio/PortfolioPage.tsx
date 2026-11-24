@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import api from "../../lib/api/client";
 import type { Project, Social } from "../../types/portfolio";
 import {
@@ -68,6 +68,20 @@ const PortfolioPage: React.FC = () => {
     () => (orderedProjects.length ? orderedProjects.map(toCaseStudy) : fallbackCaseStudies),
     [orderedProjects]
   );
+
+  const [embeddable, setEmbeddable] = useState<Record<string, boolean>>({});
+  const embedChecked = useRef(new Set<string>());
+  const activeCase = caseIdx !== null ? cases[caseIdx] : undefined;
+  const activeLiveId = activeCase && /^https?:\/\//.test(activeCase.link) ? activeCase.id : null;
+
+  useEffect(() => {
+    if (!activeLiveId || embedChecked.current.has(activeLiveId)) return;
+    embedChecked.current.add(activeLiveId);
+    api
+      .get<{ embeddable: boolean }>(`/api/projects/${activeLiveId}/embeddable`)
+      .then((res) => setEmbeddable((known) => ({ ...known, [activeLiveId]: res.data?.embeddable === true })))
+      .catch(() => {});
+  }, [activeLiveId]);
 
   const reloadProjects = useCallback(() => {
     api
@@ -237,6 +251,7 @@ const PortfolioPage: React.FC = () => {
           <CaseStudyDrawer
             cases={cases}
             index={caseIdx}
+            embeddable={activeLiveId !== null && embeddable[activeLiveId] === true}
             onClose={() => setCaseIdx(null)}
             onPrev={() => setCaseIdx((i) => (i === null ? i : (i - 1 + cases.length) % cases.length))}
             onNext={() => setCaseIdx((i) => (i === null ? i : (i + 1) % cases.length))}

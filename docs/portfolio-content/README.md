@@ -15,6 +15,7 @@ The Atelier homepage reads it; this domain does not render it.
 ## What this domain owns
 
 `lib/models/{Project,Tool,Social,Resume}.ts`, `app/api/{projects,tools,socials,resume,resumes}/**`,
+`lib/embeddable.ts` (whether a project's site can be shown in an iframe) and its test,
 `src/components/ProjectModal.tsx`, and `src/types/portfolio.ts`.
 
 ## What it does not own

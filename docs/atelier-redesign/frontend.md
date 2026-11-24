@@ -11,7 +11,7 @@
 | `Hero.tsx` | Headline plus the typed terminal driven by `useTypewriter` + `terminalScript` |
 | `MarqueeBand.tsx` | Scrolling band from `marqueeItems` (`marquee` keyframe in `src/index.css`) |
 | `SelectedWork.tsx` | Project grid, ordered by `sortProjectsForDisplay` |
-| `CaseStudyDrawer.tsx` | Slide-over case study built by `toCaseStudy` (`drawerIn` keyframe) |
+| `CaseStudyDrawer.tsx` | Slide-over case study built by `toCaseStudy` (`drawerIn` keyframe), plus a live preview of the project's site (below) |
 | `AboutSection.tsx` | `aboutContent` |
 | `StackSection.tsx` | `stackGroups` — static, not the `Tool` collection |
 | `HowIShip.tsx` | `processStages` / `processContent` |
@@ -22,6 +22,19 @@
 
 `ProjectModal` comes from `src/components/` and belongs to
 [portfolio-content](../portfolio-content/README.md).
+
+## Live preview in the case-study drawer
+
+When a case opens, `PortfolioPage` asks `GET /api/projects/[id]/embeddable` once per project (DB
+projects with an http(s) link only — the fallback cases never ask) and passes `embeddable` to the
+drawer. Only `true` renders `LivePreview` between the details grid and the "Visit the live
+project" row; anything else leaves the drawer as it was, with the screenshot hero.
+
+`LivePreview` renders the site in a sandboxed, `loading="lazy"` iframe inside a browser-style
+frame. The iframe is laid out at 1440×900 (the screenshot's viewport) and CSS-scaled to the box
+width; below 600px it switches to a 390×720 phone viewport. It stays invisible until `onLoad`,
+and ignores the pointer until the visitor clicks "Explore the live site", so scrolling past it
+scrolls the drawer. Copy lives in `caseStudyContent` in `atelier.ts`.
 
 ## Motion hooks — `src/hooks/`
 
