@@ -4,6 +4,7 @@ import type {
   ReportDigest,
   WorkAttachmentSummary,
   WorkEntry,
+  WorkEntryPage,
   WorkEntryStatus,
   WorkProjectSummary,
   WorkSessionSummary,
@@ -11,20 +12,24 @@ import type {
 
 export type EntryFilter = {
   project?: string;
-  status?: WorkEntryStatus;
+  group?: string;
+  status?: WorkEntryStatus | "open";
+  text?: string;
+  waitingOn?: string;
   since?: string;
+  until?: string;
+  offset?: number;
   limit?: number;
 };
 
-export async function fetchWorkEntries(filter: EntryFilter = {}): Promise<WorkEntry[]> {
+export async function fetchWorkEntries(filter: EntryFilter = {}): Promise<WorkEntryPage> {
   const params = new URLSearchParams();
-  if (filter.project) params.set("project", filter.project);
-  if (filter.status) params.set("status", filter.status);
-  if (filter.since) params.set("since", filter.since);
-  if (filter.limit) params.set("limit", String(filter.limit));
+  for (const [key, value] of Object.entries(filter)) {
+    if (value !== undefined && value !== "") params.set(key, String(value));
+  }
 
   const query = params.toString();
-  const res = await api.get<WorkEntry[]>(`/api/worklog/entries${query ? `?${query}` : ""}`);
+  const res = await api.get<WorkEntryPage>(`/api/worklog/entries${query ? `?${query}` : ""}`);
   return res.data;
 }
 
@@ -58,8 +63,8 @@ export async function updateEntryStatus(
 }
 
 /**
- * One request for the whole dashboard. Filtering and aggregation happen client-side
- * from this payload, so interacting with filters costs no network.
+ * One request for the dashboard's first paint: its unfiltered first page of entries plus
+ * `entryTotal`. Filters, further pages and the report are fetched from the server.
  */
 export async function fetchDashboard(): Promise<DashboardPayload> {
   const res = await api.get<DashboardPayload>("/api/worklog/dashboard");

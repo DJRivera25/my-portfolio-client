@@ -27,6 +27,7 @@ export type WorkEntryLike = {
   summary?: string | null;
   status: WorkEntryStatus;
   blockedReason?: string | null;
+  waitingOn?: string | null;
   tags?: string[] | null;
   group?: string | null;
   groupKey?: string | null;
@@ -57,6 +58,14 @@ export type ReportBlocker = {
   title: string;
   project: string;
   reason: string | null;
+  waitingOn: string | null;
+};
+
+export type ReportCountRow = {
+  project: { name: string; slug: string };
+  status: WorkEntryStatus;
+  count: number;
+  minutesSpent: number;
 };
 
 export type ReportDigest = {
@@ -125,4 +134,12 @@ export type WorkGroupSummary = {
   blocked: number;
   minutesSpent: number;
   lastActivityAt: string | null;
+};
+
+export type WorkEntryPage = {
+  entries: WorkEntryLike[];
+  total: number;
+  offset: number;
+  project: { name: string; slug: string } | null;
+  unmatched: { kind: "project" | "repo" | "session"; value: string } | null;
 };

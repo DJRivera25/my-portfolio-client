@@ -43,7 +43,9 @@ const WorkReportPanel: React.FC<Props> = ({ report, window: activeWindow, onWind
     </div>
 
     <div className="rounded-xl border border-white/[0.09] bg-white/[0.02] p-5">
-      {!report || report.total === 0 ? (
+      {!report ? (
+        <div className="h-10 rounded-lg shimmer" />
+      ) : report.total === 0 ? (
         <p className="m-0 text-[13px] text-atelier-faint">Nothing logged in this window.</p>
       ) : (
         <>
@@ -91,6 +93,11 @@ const WorkReportPanel: React.FC<Props> = ({ report, window: activeWindow, onWind
                   </li>
                 ))}
               </ul>
+              {report.byStatus.blocked > report.blockers.length && (
+                <p className="m-0 mt-2 font-codet text-[11px] text-atelier-faint">
+                  +{report.byStatus.blocked - report.blockers.length} {worklogContent.moreBlocked}
+                </p>
+              )}
             </div>
           )}
         </>

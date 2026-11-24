@@ -229,9 +229,10 @@ otherwise `doc-sync` reports the files as orphans.
     "auth": {
       "purpose": "Single-admin bearer-token auth. Login compares env vars and hands ADMIN_API_TOKEN to the client; each handler checks it. No JWT, no session store.",
       "docs": "docs/auth/",
-      "lastVerified": "2026-08-19",
+      "lastVerified": "2026-11-24",
       "paths": [
         "lib/auth.ts",
+        "lib/auth.test.ts",
         "lib/models/User.ts",
         "app/api/auth/**",
         "app/api/users/**",
@@ -285,13 +286,15 @@ otherwise `doc-sync` reports the files as orphans.
     "worklog": {
       "purpose": "Work tracking written by Claude Code over MCP: entries/tasks by project, session status, reports. Pure core + query shells in lib/worklog; /api/mcp is the Claude Code adapter, /api/worklog the dashboard adapter. Private dashboard at /worklog. Projects are matched by separator-free matchKey.",
       "docs": "docs/worklog/",
-      "lastVerified": "2026-08-19",
+      "lastVerified": "2026-11-24",
       "paths": [
         "lib/models/WorkProject.ts",
         "lib/models/WorkEntry.ts",
         "lib/models/WorkSession.ts",
         "lib/models/Counter.ts",
+        "lib/models/WorkAttachment.ts",
         "lib/worklog/**",
+        "scripts/worklog-hooks/**",
         "app/api/mcp/**",
         "app/api/worklog/**",
         "app/worklog/**",
@@ -338,7 +341,7 @@ otherwise `doc-sync` reports the files as orphans.
     "infrastructure": {
       "purpose": "DB connection, site constants, env, build and test config.",
       "docs": "docs/infrastructure/",
-      "lastVerified": "2026-08-19",
+      "lastVerified": "2026-11-24",
       "paths": [
         "lib/db.ts",
         "lib/site.ts",

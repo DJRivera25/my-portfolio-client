@@ -17,3 +17,14 @@ export function resolveCompletedAt(
   if (next === "done") return prev === "done" ? undefined : now;
   return prev === "done" ? null : undefined;
 }
+
+/** null clears, a string sets, undefined leaves the field as it is. */
+export function resolveWaitingOn(
+  status: WorkEntryStatus,
+  given: string | undefined
+): string | null | undefined {
+  if (status === "done") return null;
+  if (given === undefined) return undefined;
+  const trimmed = given.trim();
+  return trimmed === "" ? null : trimmed;
+}

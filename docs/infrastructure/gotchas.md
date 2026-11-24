@@ -57,3 +57,9 @@ uses `atelier.*` only — see [shared-ui/gotchas.md](../shared-ui/gotchas.md).
 Intended. A query before the connection is ready errors immediately instead of hanging in
 Mongoose's buffer. If you see a "not connected" error, the fix is a missing `await dbConnect()`,
 not a retry.
+
+## vitest fails everywhere from a lowercase `c:` working directory (Windows)
+
+Running `npm test` from a shell whose cwd is spelled `c:\Codes\...` makes every suite fail with
+`Cannot read properties of undefined (reading 'config')`. That is the wrong cwd, not broken code: `cd` to
+the same path with an uppercase `C:` and re-run.

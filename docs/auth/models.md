@@ -21,13 +21,13 @@
 
 `POST /api/auth/login` compares against `ADMIN_EMAIL` / `ADMIN_PASSWORD` environment variables
 and never queries `User`. **`comparePassword` is defined but never called anywhere in the
-repo**, and the `pre("save")` hook only fires through the unauthenticated `/api/users` routes.
+repo**, and the `pre("save")` hook only fires through the admin-gated `/api/users` routes.
 
 So the collection exists, its documents carry real bcrypt hashes, and nothing authenticates
 against them. Two consequences:
 
 - The bcrypt machinery is not protecting a login path — it is protecting data that only the
-  open `/api/users` endpoint writes.
+  `/api/users` endpoint writes.
 - `role` defaulting to `"admin"` is harmless only because no code reads `role` for
   authorization. If a future change starts trusting `role`, that default becomes a
   privilege-escalation bug.

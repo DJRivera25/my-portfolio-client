@@ -9,6 +9,7 @@ const WorkEntrySchema = new Schema(
     summary: { type: String },
     status: { type: String, enum: WORK_ENTRY_STATUSES, default: "done" },
     blockedReason: { type: String },
+    waitingOn: { type: String, trim: true },
     tags: { type: [String], default: [] },
     // Groups related entries within a project. groupKey is the separator-free
     // identity; group keeps the first spelling seen, for display.

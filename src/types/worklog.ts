@@ -8,6 +8,7 @@ export interface WorkEntry {
   summary?: string | null;
   status: WorkEntryStatus;
   blockedReason?: string | null;
+  waitingOn?: string | null;
   tags?: string[];
   group?: string | null;
   minutesSpent?: number | null;
@@ -57,7 +58,7 @@ export interface ReportDigest {
     open: number;
     minutesSpent: number;
   }>;
-  blockers: Array<{ ref: number; title: string; project: string; reason: string | null }>;
+  blockers: Array<{ ref: number; title: string; project: string; reason: string | null; waitingOn: string | null }>;
 }
 
 export type WorkAttachmentKind =
@@ -89,7 +90,21 @@ export interface DashboardPayload {
   sessions: WorkSessionSummary[];
   attachments: WorkAttachmentSummary[];
   groups: WorkGroupSummary[];
+  entryTotal: number;
 }
+
+export interface WorkEntryPage {
+  entries: WorkEntry[];
+  total: number;
+  offset: number;
+}
+
+export type WorkEntryFilterValue = {
+  text: string;
+  waitingOn: string;
+  from: string;
+  to: string;
+};
 
 export interface WorkGroupSummary {
   key: string;

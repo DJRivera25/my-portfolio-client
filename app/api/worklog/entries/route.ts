@@ -7,7 +7,7 @@ import {
   setWorkEntryGroup,
   updateWorkEntryStatus,
 } from "@/lib/worklog/entries";
-import { parseSince } from "@/lib/worklog/since";
+import { parseEntryQuery } from "@/lib/worklog/filters";
 import {
   WORK_ENTRY_STATUSES,
   type WorkEntryStatus,
@@ -24,16 +24,11 @@ function asStatus(value: string | null): WorkEntryStatus | undefined {
 export async function GET(req: Request) {
   if (!isAuthorizedAdmin(req)) return unauthorizedResponse();
 
-  const params = new URL(req.url).searchParams;
-  const limit = Number(params.get("limit"));
+  const parsed = parseEntryQuery(new URL(req.url).searchParams);
+  if ("error" in parsed) return NextResponse.json({ message: parsed.error }, { status: 400 });
 
-  const entries = await listWorkEntries({
-    project: params.get("project") ?? undefined,
-    status: asStatus(params.get("status")),
-    since: parseSince(params.get("since")),
-    limit: Number.isFinite(limit) && limit > 0 ? limit : undefined,
-  });
-  return NextResponse.json(entries);
+  const { entries, total, offset } = await listWorkEntries(parsed.value);
+  return NextResponse.json({ entries, total, offset });
 }
 
 export async function POST(req: Request) {

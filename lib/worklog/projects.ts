@@ -1,5 +1,6 @@
 import dbConnect from "../db";
 import WorkProject from "../models/WorkProject";
+import { normaliseRepoUrl, repoNameKey, storableRepo } from "./repo";
 import { deriveProjectName, projectMatchKey, slugifyProject } from "./slug";
 import { OPEN_STATUSES, type WorkProjectStatus, type WorkProjectSummary } from "./types";
 
@@ -24,7 +25,10 @@ export async function resolveWorkProject(key: string, patch: WorkProjectPatch = 
   const set: Record<string, unknown> = {};
   if (patch.name) set.name = patch.name;
   if (patch.description !== undefined) set.description = patch.description;
-  if (patch.repo !== undefined) set.repo = patch.repo;
+  if (patch.repo !== undefined) {
+    const repo = storableRepo(patch.repo);
+    if (repo !== null) set.repo = repo;
+  }
   if (patch.status) set.status = patch.status;
 
   // `name` must appear in exactly one of $set / $setOnInsert — Mongo rejects a field
@@ -42,6 +46,28 @@ export async function resolveWorkProject(key: string, patch: WorkProjectPatch = 
     },
     { upsert: true, new: true, setDefaultsOnInsert: true }
   );
+}
+
+export async function findWorkProjectByRepo(
+  repoUrl: string
+): Promise<{ _id: unknown; name: string; slug: string } | null> {
+  const normalised = normaliseRepoUrl(repoUrl);
+  if (!normalised) return null;
+  await dbConnect();
+
+  const withRepo = await WorkProject.find({ repo: { $type: "string", $ne: "" } })
+    .select("name slug repo")
+    .lean();
+  const exact = withRepo.find((p) => normaliseRepoUrl(String(p.repo)) === normalised);
+  if (exact) return { _id: exact._id, name: exact.name as string, slug: exact.slug as string };
+
+  const byName = await WorkProject.findOne({ matchKey: repoNameKey(normalised) }).select(
+    "name slug repo"
+  );
+  if (!byName || byName.repo) return null;
+  byName.repo = normalised;
+  await byName.save();
+  return { _id: byName._id, name: byName.name as string, slug: byName.slug as string };
 }
 
 export async function setWorkProjectStatus(key: string, patch: WorkProjectPatch) {

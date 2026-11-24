@@ -1,5 +1,5 @@
 import { createMcpHandler } from "mcp-handler";
-import { isAuthorizedMcp } from "@/lib/auth";
+import { mcpClientFor } from "@/lib/auth";
 import { registerWorklogTools } from "./tools";
 
 // Mongoose and node:crypto both need the Node runtime; this cannot run on edge.
@@ -11,12 +11,15 @@ const handler = createMcpHandler((server) => registerWorklogTools(server), {
 });
 
 async function guarded(req: Request): Promise<Response> {
-  if (!isAuthorizedMcp(req)) {
+  const client = mcpClientFor(req);
+  if (!client) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { "content-type": "application/json" },
     });
   }
+  // The real token stays out: tools only need to know which client is calling.
+  req.auth = { token: "", clientId: client, scopes: [] };
   return handler(req);
 }
 

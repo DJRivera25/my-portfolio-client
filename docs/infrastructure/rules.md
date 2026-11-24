@@ -37,7 +37,7 @@ a stated reason, not scaffolding.
 ## Keep `.env.example` in step
 
 Any new environment variable is added to `.env.example` in the same change, with a comment on what
-happens when it is unset. The table in [README.md](./README.md) is the current inventory.
+happens when it is unset. The table in [README.md](./README.md) is the current inventory. Secrets (tokens, passwords) get an empty placeholder and a comment on how to generate them — never a real value.
 
 ## Widen the vitest glob deliberately
 

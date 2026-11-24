@@ -1,5 +1,5 @@
 /**
- * Static presentation config for the worklog dashboard and the public Build Log.
+ * Static presentation config for the worklog dashboard.
  * Copy and status tokens live here so components stay free of hardcoded strings.
  */
 import type { WorkEntryStatus, WorkProjectStatus } from "../types/worklog";
@@ -35,7 +35,20 @@ export const worklogContent = {
   sessionsEmpty: "No sessions recorded yet.",
   reportTitle: "Report",
   projectsTitle: "Projects",
+  groupsTitle: "Groups",
+  entriesTitle: "Entries",
   filterAll: "All",
+  searchPlaceholder: "Search titles and summaries",
+  waitingOnPlaceholder: "Waiting on…",
+  fromLabel: "From",
+  toLabel: "To",
+  showing: "Showing",
+  of: "of",
+  loadMore: "Load more",
+  waitingOnPrefix: "Waiting on",
+  moreBlocked: "more blocked",
+  loadError: "Could not load the worklog. Check that you are still signed in.",
+  updateError: "Could not update entry",
 } as const;
 
 export const REPORT_WINDOWS = [

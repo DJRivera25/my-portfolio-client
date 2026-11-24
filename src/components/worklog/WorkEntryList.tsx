@@ -108,6 +108,12 @@ const WorkEntryList: React.FC<Props> = ({ entries, attachmentsByEntry, busyRef, 
                   </p>
                 )}
 
+                {entry.status !== "done" && entry.waitingOn && (
+                  <p className="m-0 mt-1.5 font-codet text-[11px] text-atelier-muted">
+                    {worklogContent.waitingOnPrefix} {entry.waitingOn}
+                  </p>
+                )}
+
                 {entry.tags && entry.tags.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {entry.tags.map((tag) => (

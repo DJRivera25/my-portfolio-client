@@ -18,18 +18,20 @@ Notes:
 - The comparison is `===` on both fields, so it is not constant-time.
 - The response body echoes the submitted `email` rather than a stored user record.
 
-## `/api/users` — **currently unauthenticated**
+## `/api/users` — admin-gated, password never returned
 
 [`app/api/users/route.ts`](../../app/api/users/route.ts) exports `GET`, `POST`, `PUT`, and
-`DELETE`. **None of them call `isAuthorizedAdmin`.**
+`DELETE`. Each starts with `isAuthorizedAdmin(req)` → `401 {"message":"Unauthorized"}`, and every
+read-back uses `.select("-password")` (`SAFE_FIELDS`). Nothing in the app calls this endpoint.
 
-| Method | Behaviour | Problem |
-|---|---|---|
-| `GET` | `User.find()` → full documents | Returns the bcrypt `password` hash for every user |
-| `POST` | `User.create(req.json())` | Anyone can create an admin — `role` defaults to `"admin"` |
-| `PUT` | `findByIdAndUpdate(id, update)` | Unrestricted field update, including `role` and `password` |
-| `DELETE` | `findByIdAndDelete(id)` | Anyone can delete any user |
+| Method | Behaviour |
+|---|---|
+| `GET` | `User.find().select("-password")` |
+| `POST` | `User.create(body)`; returns the created user without `password` (`201`) |
+| `PUT` | body `{ id, ...update }` → `findByIdAndUpdate`; `404 {"message":"User not found"}` if absent |
+| `DELETE` | body `{ id }` → `findByIdAndDelete`; `404 {"message":"User not found"}` if absent |
 
-This is the single largest security gap in the repo. Both project rules it violates —
-"admin auth on protected routes" and "don't leak password hashes" — are documented in
-[rules.md](./rules.md), and the fix is described there.
+Remaining caveats: `PUT` passes the body straight to `findByIdAndUpdate`, so it can set `role` or
+`password`, and an update query does not run the `pre("save")` hash hook, so a `password` set this
+way would be stored as given (_TODO: verify against a real update._). `POST` creates users whose
+`role` defaults to `"admin"`.

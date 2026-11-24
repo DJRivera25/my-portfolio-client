@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { resolveCompletedAt } from "./status";
+import { resolveCompletedAt, resolveWaitingOn } from "./status";
 import { deriveProjectName, groupKey, projectMatchKey, slugifyProject } from "./slug";
 
 const now = new Date("2026-08-18T12:00:00.000Z");
@@ -29,6 +29,13 @@ describe("resolveCompletedAt", () => {
   it("stamps on a first-time done with no previous status", () => {
     expect(resolveCompletedAt(undefined, "done", now)).toBe(now);
   });
+});
+
+describe("resolveWaitingOn", () => {
+  it("clears on done, whatever was given", () => expect(resolveWaitingOn("done", "Derem")).toBeNull());
+  it("clears on a blank value", () => expect(resolveWaitingOn("blocked", "  ")).toBeNull());
+  it("sets a given name", () => expect(resolveWaitingOn("todo", "Derem")).toBe("Derem"));
+  it("leaves it alone when not given", () => expect(resolveWaitingOn("blocked", undefined)).toBeUndefined());
 });
 
 describe("slugifyProject", () => {

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { McpClient } from "@/lib/auth";
 import type { McpServer } from "@modelcontextprotocol/server";
 import {
   buildReport,
@@ -11,13 +12,13 @@ import { listWorkProjects, setWorkProjectStatus } from "@/lib/worklog/projects";
 import { listWorkGroups } from "@/lib/worklog/groups";
 import { endSession, getSessionStatus } from "@/lib/worklog/sessions";
 import { attachLink, listAttachments } from "@/lib/worklog/attachmentQueries";
-import { formatEntries, formatReport } from "@/lib/worklog/format";
-import { parseSince } from "@/lib/worklog/since";
+import { formatEntryPage, formatReport } from "@/lib/worklog/format";
+import { storableRepo } from "@/lib/worklog/repo";
+import { parseSince, parseUntil } from "@/lib/worklog/since";
 import {
   WORK_ENTRY_STATUSES,
   WORK_ATTACHMENT_KINDS,
   WORK_PROJECT_STATUSES,
-  type WorkEntryLike,
 } from "@/lib/worklog/types";
 
 /**
@@ -32,7 +33,19 @@ const text = (body: string) => ({ content: [{ type: "text" as const, text: body 
 const sinceArg = z
   .string()
   .optional()
-  .describe("Window start: '7d', '24h', '2w', or an ISO date like '2026-08-01'.");
+  .describe("Window start: '7d', '24h', '2w', or an ISO date like '2026-08-01'. A bare date is a UTC day; for a local day pass e.g. '2026-11-24T00:00+11:00'.");
+
+const waitingOnArg = z
+  .string()
+  .optional()
+  .describe(
+    "Who or what this waits on, as a short name: 'Derem', 'PR #1018', 'Track 4'. " +
+      "Pass an empty string to clear. Cleared automatically when done."
+  );
+
+function clientOf(ctx?: { http?: { authInfo?: { clientId?: string } } }): McpClient {
+  return ctx?.http?.authInfo?.clientId === "claude-ai" ? "claude-ai" : "claude-code";
+}
 
 function entryLine(entry: Record<string, unknown> | null): string {
   if (!entry) return "No entry.";
@@ -81,14 +94,16 @@ export function registerWorklogTools(server: McpServer) {
           .describe("The commit subject line, so the log is readable without the repo."),
         pr_url: z.string().optional(),
         blocked_reason: z.string().optional().describe("Give this whenever status is 'blocked'."),
+        waiting_on: waitingOnArg,
         session_id: z
           .string()
           .optional()
           .describe("The current Claude Code session id. Creates and tracks the session."),
       }),
     },
-    async (input) => {
+    async (input, ctx) => {
       const entry = await logWork({
+        source: clientOf(ctx) === "claude-ai" ? "claude-ai" : undefined,
         project: input.project,
         title: input.title,
         summary: input.summary,
@@ -101,6 +116,7 @@ export function registerWorklogTools(server: McpServer) {
         commitMessage: input.commit_message,
         prUrl: input.pr_url,
         blockedReason: input.blocked_reason,
+        waitingOn: input.waiting_on,
         sessionId: input.session_id,
       });
       return text(`Logged ${entryLine(entry as Record<string, unknown> | null)}`);
@@ -112,27 +128,50 @@ export function registerWorklogTools(server: McpServer) {
     {
       title: "List work",
       description:
-        "List worklog entries, newest first. Use it to answer what is outstanding, what " +
-        "was done recently, or what is blocked — filter by status 'todo' or 'in_progress' " +
-        "for the open backlog. Worth checking before starting on a project so you do not " +
-        "redo something already logged.",
+        "List worklog entries, newest first, one page at a time. Use it to answer what is " +
+        "outstanding (status 'open'), blocked, or waiting on someone, or what was done in a " +
+        "window — and check it before starting work so nothing is redone. Always pass " +
+        "`project` for your own project; omit it only to look across every project on " +
+        "purpose. When there is more than one page, the reply ends with the offset to pass " +
+        "for the next.",
       inputSchema: z.object({
         project: z.string().optional().describe("Restrict to one project key."),
+        repo: z
+          .string()
+          .optional()
+          .describe("The git remote URL; finds the project by its repo. Ignored if project is given."),
         group: z.string().optional().describe("Restrict to one group label."),
-        status: z.enum(WORK_ENTRY_STATUSES).optional(),
+        status: z
+          .enum([...WORK_ENTRY_STATUSES, "open"])
+          .optional()
+          .describe("'open' means todo, in_progress and blocked."),
+        text: z.string().optional().describe("Match in the title or summary."),
+        waiting_on: z.string().optional().describe("Match who or what the entry waits on."),
         since: sinceArg,
+        until: z
+          .string()
+          .optional()
+          .describe("Window end: an ISO date like '2026-08-31' includes that whole day. A bare date is a UTC day; for a local day pass e.g. '2026-11-24T00:00+11:00'."),
+        session_id: z.string().optional().describe("Restrict to one Claude Code session id."),
+        offset: z.number().int().min(0).optional().describe("Entries to skip. Defaults to 0."),
         limit: z.number().int().min(1).max(100).optional().describe("Defaults to 25."),
       }),
     },
     async (input) => {
-      const entries = await listWorkEntries({
+      const page = await listWorkEntries({
         project: input.project,
+        repo: input.repo,
         group: input.group,
         status: input.status,
+        text: input.text,
+        waitingOn: input.waiting_on,
         since: parseSince(input.since),
+        until: parseUntil(input.until),
+        sessionId: input.session_id,
+        offset: input.offset,
         limit: input.limit,
       });
-      return text(formatEntries(entries as unknown as WorkEntryLike[]));
+      return text(formatEntryPage(page));
     }
   );
 
@@ -148,11 +187,17 @@ export function registerWorklogTools(server: McpServer) {
       inputSchema: z.object({
         ref: z.number().int().describe("The entry's short id, e.g. 42 for '#42'."),
         status: z.enum(WORK_ENTRY_STATUSES),
-        blocked_reason: z.string().optional().describe("What the work is waiting on."),
+        blocked_reason: z.string().optional().describe("Why it is blocked. Put the person or thing in waiting_on."),
+        waiting_on: waitingOnArg,
       }),
     },
     async (input) => {
-      const entry = await updateWorkEntryStatus(input.ref, input.status, input.blocked_reason);
+      const entry = await updateWorkEntryStatus(
+        input.ref,
+        input.status,
+        input.blocked_reason,
+        input.waiting_on
+      );
       if (!entry) return text(`No entry #${input.ref}.`);
       return text(`Updated ${entryLine(entry as Record<string, unknown>)}`);
     }
@@ -196,7 +241,10 @@ export function registerWorklogTools(server: McpServer) {
         status: z.enum(WORK_PROJECT_STATUSES).optional(),
         name: z.string().optional().describe("Display name, e.g. 'Tools Australia'."),
         description: z.string().optional(),
-        repo: z.string().optional(),
+        repo: z
+          .string()
+          .optional()
+          .describe("The git remote URL; stored normalised and used to match sessions to this project."),
       }),
     },
     async (input) => {
@@ -206,7 +254,13 @@ export function registerWorklogTools(server: McpServer) {
         description: input.description,
         repo: input.repo,
       });
-      return text(`${project.slug} — ${project.name} (${project.status})`);
+      const refused = input.repo !== undefined && storableRepo(input.repo) === null;
+      return text(
+        `${project.slug} — ${project.name} (${project.status})` +
+          (refused
+            ? " — repo not saved: it looks like it carries login details; pass the plain https or git@ URL"
+            : "")
+      );
     }
   );
 
